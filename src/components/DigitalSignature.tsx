@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Pen, RotateCcw, Check } from 'lucide-react'
 
 interface DigitalSignatureProps {
@@ -7,6 +8,7 @@ interface DigitalSignatureProps {
 }
 
 const DigitalSignature: React.FC<DigitalSignatureProps> = ({ onSignatureChange, value }) => {
+  const { t } = useTranslation()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [isDrawing, setIsDrawing] = useState(false)
   const [hasSignature, setHasSignature] = useState(false)
@@ -143,7 +145,7 @@ const DigitalSignature: React.FC<DigitalSignatureProps> = ({ onSignatureChange, 
       <div className="flex items-center gap-2 mb-2">
         <Pen className="w-4 h-4 text-gray-600" />
         <label className="text-sm font-medium text-gray-700">
-          የዲጂታል ፊርማ (Digital Signature) *
+          {t('digital_signature_label')}
         </label>
       </div>
       
@@ -164,9 +166,9 @@ const DigitalSignature: React.FC<DigitalSignatureProps> = ({ onSignatureChange, 
         />
         
         <div className="flex justify-between items-center mt-3">
-{/*           <p className="text-xs text-gray-500">
-            * ይህ መስክ ግዴታ ነው። የስልክዎ ስክሪን የማይሰራ ከሆነ ፎቶ አንስተው ማስገባት ይችላሉ።
-          </p> */}
+          <p className="text-xs text-gray-500">
+            {t('digital_signature_hint')}
+          </p>
           
           <div className="flex gap-2">
             <button
@@ -175,13 +177,13 @@ const DigitalSignature: React.FC<DigitalSignatureProps> = ({ onSignatureChange, 
               className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded transition-colors"
             >
               <RotateCcw className="w-3 h-3" />
-              አጥፋ
+              {t('clear')}
             </button>
             
             {hasSignature && (
               <div className="flex items-center gap-1 px-3 py-1 text-sm bg-green-100 text-green-700 rounded">
                 <Check className="w-3 h-3" />
-                ፊርማ ተደርጓል
+                {t('signature_saved')}
               </div>
             )}
           </div>

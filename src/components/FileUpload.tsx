@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Upload, X, Check } from 'lucide-react'
 
 interface FileUploadProps {
@@ -9,6 +10,7 @@ interface FileUploadProps {
 }
 
 const FileUpload: React.FC<FileUploadProps> = ({ label, onChange, accept = "image/*", required = false }) => {
+  const { t } = useTranslation()
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
 
@@ -74,7 +76,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ label, onChange, accept = "imag
                     {file.name}
                   </span>
                 ) : (
-                  "ፋይል ይምረጡ"
+                  t('choose_file')
                 )}
               </p>
             </div>

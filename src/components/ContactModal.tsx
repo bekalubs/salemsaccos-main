@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { X, Phone, Mail, MapPin, Clock } from 'lucide-react'
 
 interface ContactModalProps {
@@ -7,6 +8,7 @@ interface ContactModalProps {
 }
 
 const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
+  const { t } = useTranslation()
   if (!isOpen) return null
 
   return (
@@ -14,7 +16,7 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
       <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 p-6 rounded-t-2xl flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-gray-900">ያግኙን</h2>
+          <h2 className="text-2xl font-bold text-gray-900">{t('contact')}</h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100 transition-colors"
@@ -33,7 +35,7 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
                   <Phone className="w-6 h-6 text-green-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">ስልክ ቁጥሮች</h3>
+                  <h3 className="font-semibold text-gray-900 mb-1">{t('phone_numbers')}</h3>
                   <p className="text-gray-600">+251 910 4169 32</p>
                   <p className="text-gray-600">+251 911 123 456</p>
                 </div>
@@ -44,7 +46,7 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
                   <Mail className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">ኢሜይል አድራሻ</h3>
+                  <h3 className="font-semibold text-gray-900 mb-1">{t('email_address')}</h3>
                   <p className="text-gray-600">info@salemsaccos.com</p>
                   <p className="text-gray-600">support@salemsaccos.com</p>
                 </div>
@@ -57,7 +59,7 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
                   <MapPin className="w-6 h-6 text-purple-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">አድራሻ</h3>
+                  <h3 className="font-semibold text-gray-900 mb-1">{t('address')}</h3>
                   <p className="text-gray-600">አዲስ አበባ፣ ኢትዮጵያ</p>
                   <p className="text-gray-600">ቦሌ ክፍለ ከተማ</p>
                   <p className="text-gray-600">ወረዳ 03</p>
@@ -69,10 +71,10 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
                   <Clock className="w-6 h-6 text-yellow-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">የሥራ ሰዓት</h3>
-                  <p className="text-gray-600">ሰኞ - አርብ: 8:00 ጠዋት - 5:00 ከሰዓት</p>
-                  <p className="text-gray-600">ቅዳሜ: 8:00 ጠዋት - 12:00 ቀትር</p>
-                  <p className="text-gray-600">እሁድ: ዝግ</p>
+                  <h3 className="font-semibold text-gray-900 mb-1">{t('working_hours')}</h3>
+                  <p className="text-gray-600">{t('monday_friday')}</p>
+                  <p className="text-gray-600">{t('saturday')}</p>
+                  <p className="text-gray-600">{t('sunday')}</p>
                 </div>
               </div>
             </div>
@@ -80,33 +82,33 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
 
           {/* Quick Actions */}
           <div className="border-t border-gray-200 pt-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">ፈጣን እርምጃዎች</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('quick_actions')}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <a
                 href="tel:+251910416932"
                 className="flex items-center justify-center space-x-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
               >
                 <Phone className="w-5 h-5" />
-                <span>አሁን ይደውሉ</span>
+                <span>{t('call_now')}</span>
               </a>
               <a
                 href="mailto:info@salemsaccos.com"
                 className="flex items-center justify-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <Mail className="w-5 h-5" />
-                <span>ኢሜይል ይላኩ</span>
+                <span>{t('send_email')}</span>
               </a>
             </div>
           </div>
 
           {/* Additional Information */}
           <div className="bg-gray-50 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">ተጨማሪ መረጃ</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('more_info')}</h3>
             <div className="space-y-2 text-sm text-gray-600">
-              <p>• ለአዲስ አባልነት ምዝገባ ቅድሚያ ይደውሉ</p>
-              <p>• ለብድር አገልግሎት ቀጠሮ ማስያዝ ይቻላል</p>
-              <p>• የቁጠባ መረጃ በስልክ ማግኘት ይቻላል</p>
-              <p>• ለአስቸኳይ ጉዳዮች 24/7 የድጋፍ አገልግሎት አለ</p>
+              <p>{t('info_new_member')}</p>
+              <p>{t('info_loan')}</p>
+              <p>{t('info_savings')}</p>
+              <p>{t('info_support')}</p>
             </div>
           </div>
         </div>

@@ -2,6 +2,7 @@
 
 import type React from "react"
 import { useState, useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import {
   Users,
   Search,
@@ -19,6 +20,7 @@ import {
 import { supabase, type Member } from "../lib/supabase"
 
 const MembersList: React.FC = () => {
+  const { t } = useTranslation()
   const [members, setMembers] = useState<Member[]>([])
   const [filteredMembers, setFilteredMembers] = useState<Member[]>([])
   const [paginatedMembers, setPaginatedMembers] = useState<Member[]>([])
@@ -122,7 +124,7 @@ const MembersList: React.FC = () => {
       <!DOCTYPE html>
       <html>
         <head>
-          <title>ሳሌም ሳኮስ - የአባላት ዝርዝር</title>
+          <title>${t('saccos')} - ${t('members_list_report')}</title>
           <style>
             body { font-family: Arial, sans-serif; margin: 20px; }
             .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #16a34a; padding-bottom: 20px; }
@@ -141,49 +143,49 @@ const MembersList: React.FC = () => {
         </head>
         <body>
           <div class="header">
-            <div class="logo">ሳሌም ሳኮስ</div>
-            <div class="subtitle">የወንድሞች እና እህቶች ቁጠባና ብድር ኅብረት ስራ ማኅበር</div>
-            <div class="subtitle">የአባላት ዝርዝር ዘገባ</div>
+            <div class="logo">${t('saccos')}</div>
+            <div class="subtitle">${t('saccos_desc')}</div>
+            <div class="subtitle">${t('members_list_report')}</div>
           </div>
           
           <div class="filters">
-            <h3>የማጣሪያ መረጃ:</h3>
-            <div class="filter-item"><strong>ክልል:</strong> ${regionFilter === "all" ? "ሁሉም" : regionFilter}</div>
-            <div class="filter-item"><strong>የፍለጋ ምድብ:</strong> ${
+            <h3>${t('filter_info')}:</h3>
+            <div class="filter-item"><strong>${t('region')}:</strong> ${regionFilter === "all" ? t('all') : regionFilter}</div>
+            <div class="filter-item"><strong>${t('search_category')}:</strong> ${
               searchCategory === "all"
-                ? "ሁሉም"
+                ? t('all')
                 : searchCategory === "name"
-                  ? "ስም"
+                  ? t('name')
                   : searchCategory === "phone"
-                    ? "ስልክ ቁጥር"
+                    ? t('phone_number')
                     : searchCategory === "address"
-                      ? "አድራሻ"
+                      ? t('address')
                       : searchCategory === "occupation"
-                        ? "ስራ"
+                        ? t('occupation')
                         : searchCategory === "id"
-                          ? "መታወቂያ"
+                          ? t('id')
                           : searchCategory
             }</div>
-            <div class="filter-item"><strong>የፍለጋ ቃል:</strong> ${searchTerm || "ምንም"}</div>
-            <div class="filter-item"><strong>ጠቅላላ ውጤቶች:</strong> ${filteredMembers.length} አባላት</div>
-            <div class="filter-item"><strong>የህትመት ቀን:</strong> ${new Date().toLocaleDateString("am-ET")}</div>
+            <div class="filter-item"><strong>${t('search_term')}:</strong> ${searchTerm || t('none')}</div>
+            <div class="filter-item"><strong>${t('total_results')}:</strong> ${filteredMembers.length} ${t('members')}</div>
+            <div class="filter-item"><strong>${t('print_date')}:</strong> ${new Date().toLocaleDateString("am-ET")}</div>
           </div>
           
           <table>
             <thead>
               <tr>
-                <th>ተ.ቁ</th>
-                <th>ሙሉ ስም</th>
-                <th>የአባት ስም</th>
-                <th>የአያት ስም</th>
-                <th>ጾታ</th>
-                <th>ክልል</th>
-                <th>ወረዳ</th>
-                <th>ከተማ/ቀበሌ</th>
-                <th>ስልክ ቁጥር</th>
-                <th>ስራ</th>
-                <th>የጋብቻ ሁኔታ</th>
-                <th>የምዝገባ ቀን</th>
+                <th>${t('serial_number')}</th>
+                <th>${t('full_name')}</th>
+                <th>${t('father_name')}</th>
+                <th>${t('grandfather_name')}</th>
+                <th>${t('gender')}</th>
+                <th>${t('region')}</th>
+                <th>${t('woreda')}</th>
+                <th>${t('city_kebele')}</th>
+                <th>${t('phone_number')}</th>
+                <th>${t('occupation')}</th>
+                <th>${t('marital_status')}</th>
+                <th>${t('registration_date')}</th>
               </tr>
             </thead>
             <tbody>
@@ -195,7 +197,7 @@ const MembersList: React.FC = () => {
                   <td>${member.full_name}</td>
                   <td>${member.father_name}</td>
                   <td>${member.grandfather_name}</td>
-                  <td>${member.gender === "male" ? "ወንድ" : "ሴት"}</td>
+                  <td>${member.gender === "male" ? t('male') : t('female')}</td>
                   <td>${member.region}</td>
                   <td>${member.woreda}</td>
                   <td>${member.city_kebele}</td>
@@ -211,9 +213,9 @@ const MembersList: React.FC = () => {
           </table>
           
           <div class="footer">
-            <p>ሳሌም ሳኮስ - የወንድሞች እና እህቶች ቁጠባና ብድር ኅብረት ስራ ማኅበር</p>
-            <p>ስልክ: +251 910 4169 32 | ኢሜይል: info@salemsaccos.com</p>
-            <p>አዲስ አበባ፣ ኢትዮጵያ</p>
+            <p>${t('footer_saccos')}</p>
+            <p>${t('footer_contact')}</p>
+            <p>${t('addis_ababa_ethiopia')}</p>
           </div>
         </body>
       </html>
@@ -263,7 +265,7 @@ const MembersList: React.FC = () => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b p-4 flex justify-between items-center">
-          <h2 className="text-xl font-bold text-gray-900">የአባል ዝርዝር መረጃ</h2>
+          <h2 className="text-xl font-bold text-gray-900">{t('member_detail_info')}</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
             <X className="w-6 h-6" />
           </button>
@@ -272,30 +274,30 @@ const MembersList: React.FC = () => {
         <div className="p-6 space-y-6">
           {/* Personal Information */}
           <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-semibold text-gray-900 mb-3">የግል መረጃ</h3>
+            <h3 className="font-semibold text-gray-900 mb-3">{t('personal_info')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="font-medium text-gray-700">ሙሉ ስም:</span>
+                <span className="font-medium text-gray-700">{t('full_name')}:</span>
                 <span className="ml-2">{member.full_name}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-700">የአባት ስም:</span>
+                <span className="font-medium text-gray-700">{t('father_name')}:</span>
                 <span className="ml-2">{member.father_name}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-700">የአያት ስም:</span>
+                <span className="font-medium text-gray-700">{t('grandfather_name')}:</span>
                 <span className="ml-2">{member.grandfather_name}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-700">ጾታ:</span>
-                <span className="ml-2">{member.gender === "male" ? "ወንድ" : "ሴት"}</span>
+                <span className="font-medium text-gray-700">{t('gender')}:</span>
+                <span className="ml-2">{member.gender === "male" ? t('male') : t('female')}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-700">የጋብቻ ሁኔታ:</span>
+                <span className="font-medium text-gray-700">{t('marital_status')}:</span>
                 <span className="ml-2">{member.marital_status}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-700">ስራ/ትምህርት:</span>
+                <span className="font-medium text-gray-700">{t('occupation_education')}:</span>
                 <span className="ml-2">{member.occupation}</span>
               </div>
             </div>
@@ -303,27 +305,27 @@ const MembersList: React.FC = () => {
 
           {/* Contact Information */}
           <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-semibold text-gray-900 mb-3">የግ Hannah መረጃ</h3>
+            <h3 className="font-semibold text-gray-900 mb-3">{t('contact_info')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="font-medium text-gray-700">ክልል:</span>
+                <span className="font-medium text-gray-700">{t('region')}:</span>
                 <span className="ml-2">{member.region}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-700">ወረዳ:</span>
+                <span className="font-medium text-gray-700">{t('woreda')}:</span>
                 <span className="ml-2">{member.woreda}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-700">ከተማ/ቀበሌ:</span>
+                <span className="font-medium text-gray-700">{t('city_kebele')}:</span>
                 <span className="ml-2">{member.city_kebele}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-700">ስልክ ቁጥር:</span>
+                <span className="font-medium text-gray-700">{t('phone_number')}:</span>
                 <span className="ml-2">{member.phone_number}</span>
               </div>
               {member.referrer_phone && (
                 <div>
-                  <span className="font-medium text-gray-700">የመሳቢያ ስልክ:</span>
+                  <span className="font-medium text-gray-700">{t('referrer_phone')}:</span>
                   <span className="ml-2">{member.referrer_phone}</span>
                 </div>
               )}
@@ -332,10 +334,10 @@ const MembersList: React.FC = () => {
 
           {/* ID Information */}
           <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-semibold text-gray-900 mb-3">የመታወቂያ መረጃ</h3>
+            <h3 className="font-semibold text-gray-900 mb-3">{t('id_info')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="font-medium text-gray-700">የፋይዳ መታወቂያ FCN:</span>
+                <span className="font-medium text-gray-700">{t('id_fcn')}:</span>
                 <span className="ml-2">{member.id_fcn}</span>
               </div>
             </div>
@@ -344,7 +346,7 @@ const MembersList: React.FC = () => {
           {/* Digital Signature */}
           {member.digital_signature_url && (
             <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="font-semibold text-gray-900 mb-3">ዲጂታል ፊርማ</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">{t('digital_signature')}</h3>
               <img
                 src={member.digital_signature_url || "/placeholder.svg"}
                 alt="Digital Signature"
@@ -355,7 +357,7 @@ const MembersList: React.FC = () => {
 
           {/* Registration Date */}
           <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-semibold text-gray-900 mb-3">የምዝገባ ቀን</h3>
+            <h3 className="font-semibold text-gray-900 mb-3">{t('registration_date')}</h3>
             <p className="text-sm text-gray-700">{formatDate(member.created_at)}</p>
           </div>
         </div>
@@ -379,11 +381,11 @@ const MembersList: React.FC = () => {
             <div>
               <h1 className="text-2xl font-bold text-gray-900 flex items-center">
                 <Users className="w-6 h-6 mr-2" />
-                የተመዘገቡ አባላት
+                {t('registered_members')}
               </h1>
               <p className="text-gray-600 mt-1">
-                ጠቅላላ {filteredMembers.length} አባላት ተመዝግበዋል
-                {filteredMembers.length !== members.length && ` (ከ ${members.length} ውስጥ)`}
+                {t('total')} {filteredMembers.length} {t('members')} {t('registered')}
+                {filteredMembers.length !== members.length && ` (${t('from')} ${members.length} ${t('total')})`}
               </p>
             </div>
 
@@ -391,7 +393,7 @@ const MembersList: React.FC = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
                 type="text"
-                placeholder="ስም፣ ስልክ ቁጥር ወይም አድራሻ ይፈልጉ..."
+                placeholder={t('search_placeholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent w-full md:w-80"
@@ -406,14 +408,14 @@ const MembersList: React.FC = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <Filter className="inline w-4 h-4 mr-1" />
-                በክልል ማጣሪያ
+                {t('region_filter')}
               </label>
               <select
                 value={regionFilter}
                 onChange={(e) => setRegionFilter(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               >
-                <option value="all">ሁሉም ክልሎች</option>
+                <option value="all">{t('all_regions')}</option>
                 {getUniqueRegions().map((region) => (
                   <option key={region} value={region}>
                     {region}
@@ -424,18 +426,18 @@ const MembersList: React.FC = () => {
 
             {/* Search Category */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">የፍለጋ ምድብ</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t('search_category')}</label>
               <select
                 value={searchCategory}
                 onChange={(e) => setSearchCategory(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               >
-                <option value="all">ሁሉም</option>
-                <option value="name">ስም</option>
-                <option value="phone">ስልክ ቁጥር</option>
-                <option value="address">አድራሻ</option>
-                <option value="occupation">ስራ</option>
-                <option value="id">መታወቂያ</option>
+                <option value="all">{t('all')}</option>
+                <option value="name">{t('name')}</option>
+                <option value="phone">{t('phone_number')}</option>
+                <option value="address">{t('address')}</option>
+                <option value="occupation">{t('occupation')}</option>
+                <option value="id">{t('id')}</option>
               </select>
             </div>
 
@@ -446,7 +448,7 @@ const MembersList: React.FC = () => {
                 className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors w-full justify-center"
               >
                 <Printer className="w-4 h-4 mr-2" />
-                ህትመት
+                {t('print')}
               </button>
             </div>
           </div>
@@ -456,17 +458,13 @@ const MembersList: React.FC = () => {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ስም</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  ስልክ ቁጥር
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">አድራሻ</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ጾታ</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ስራ</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  የምዝገባ ቀን
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ተግባር</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('name')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('phone_number')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('address')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('gender')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('occupation')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('registration_date')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('actions')}</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -491,7 +489,7 @@ const MembersList: React.FC = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {member.gender === "male" ? "ወንድ" : "ሴት"}
+                    {member.gender === "male" ? t('male') : t('female')}
                   </td>
                   {/* Occupation Column */}
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{member.occupation}</td>
@@ -507,7 +505,7 @@ const MembersList: React.FC = () => {
                       className="flex items-center text-green-600 hover:text-green-700 text-sm font-medium"
                     >
                       <Eye className="w-4 h-4 mr-1" />
-                      ዝርዝር ይመልከቱ
+                      {t('view_details')}
                     </button>
                   </td>
                 </tr>
@@ -518,7 +516,7 @@ const MembersList: React.FC = () => {
           {paginatedMembers.length === 0 && filteredMembers.length === 0 && (
             <div className="text-center py-12">
               <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">{searchTerm ? "ምንም ውጤት አልተገኘም" : "ምንም አባላት እስካሁን አልተመዘገቡም"}</p>
+              <p className="text-gray-500">{searchTerm ? t('no_results') : t('no_members_yet')}</p>
             </div>
           )}
         </div>
@@ -528,8 +526,7 @@ const MembersList: React.FC = () => {
           <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
             <div className="flex items-center justify-between">
               <div className="text-sm text-gray-700">
-                የ {(currentPage - 1) * itemsPerPage + 1} እስከ{" "}
-                {Math.min(currentPage * itemsPerPage, filteredMembers.length)} ከ {filteredMembers.length} ውጤቶች
+                {t('from_result', { from: (currentPage - 1) * itemsPerPage + 1, to: Math.min(currentPage * itemsPerPage, filteredMembers.length), total: filteredMembers.length })}
               </div>
 
               {/* Pagination Controls */}
@@ -540,7 +537,7 @@ const MembersList: React.FC = () => {
                   className="flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ChevronLeft className="w-4 h-4 mr-1" />
-                  ቀዳሚ
+                  {t('previous')}
                 </button>
 
                 <div className="flex space-x-1">
@@ -579,7 +576,7 @@ const MembersList: React.FC = () => {
                   disabled={currentPage === totalPages}
                   className="flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  ቀጣይ
+                  {t('next')}
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </button>
               </div>

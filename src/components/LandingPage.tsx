@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useState, useEffect } from 'react'
 import { 
   Building, 
@@ -24,6 +25,7 @@ interface LandingPageProps {
 }
 
 const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
+  const { t } = useTranslation()
   const [memberCount, setMemberCount] = useState(0)
   const [loading, setLoading] = useState(true)
 
@@ -55,13 +57,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h1 className="text-5xl font-bold mb-6 leading-tight">
-                ሳሌም ሳኮስ
+                {t('hero_title')}
                 <span className="block text-3xl text-green-200 mt-2">
-                  የወንድሞች እና እህቶች ቁጠባና ብድር ኅብረት ስራ ማኅበር
+                  {t('saccos_desc')}
                 </span>
               </h1>
               <p className="text-xl mb-8 text-green-100 leading-relaxed">
-                ለማህበረሰባችን የተሻለ የኢኮኖሚ ደህንነት እና የፋይናንስ ነጻነት ለማምጣት የተቋቋመ ታማኝ የፋይናንስ ተቋም
+                {t('hero_subtitle')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <button 
@@ -69,14 +71,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
                   className="bg-white text-green-700 px-8 py-4 rounded-lg font-semibold hover:bg-green-50 transition-colors flex items-center justify-center"
                 >
                   <Users className="w-5 h-5 mr-2" />
-                  አባል ይሁኑ
+                  {t('add_member')}
                 </button>
                 <button 
                   onClick={onContactClick}
                   className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-green-700 transition-colors flex items-center justify-center"
                 >
                   <Phone className="w-5 h-5 mr-2" />
-                  ያግኙን
+                  {t('contact_us')}
                 </button>
               </div>
             </div>
@@ -90,28 +92,28 @@ const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
                     <h3 className="text-2xl font-bold">
                       {loading ? '...' : `${memberCount}+`}
                     </h3>
-                    <p className="text-green-200">አባላት</p>
+                    <p className="text-green-200">{t('members')}</p>
                   </div>
                   <div className="text-center">
                     <div className="bg-blue-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
                       <Banknote className="w-8 h-8 text-white" />
                     </div>
                     <h3 className="text-2xl font-bold">10M+</h3>
-                    <p className="text-green-200">ብር መነሻ ቁጠባ</p>
+                    <p className="text-green-200">{t('initial_savings')}</p>
                   </div>
                   <div className="text-center">
                     <div className="bg-yellow-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
                       <TrendingUp className="w-8 h-8 text-white" />
                     </div>
                     <h3 className="text-2xl font-bold">100%</h3>
-                    <p className="text-green-200">የሚታመን</p>
+                    <p className="text-green-200">{t('trusted')}</p>
                   </div>
                   <div className="text-center">
                     <div className="bg-purple-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
                       <Shield className="w-8 h-8 text-white" />
                     </div>
                     <h3 className="text-2xl font-bold">2+</h3>
-                    <p className="text-green-200">ዓመታት  ምስረታ ሂደት ላይ </p>
+                    <p className="text-green-200">{t('years_in_service')}</p>
                   </div>
                 </div>
               </div>
@@ -120,54 +122,54 @@ const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
         </div>
       </section>
 
-      {/* About Salem Section */}
+{/* About Salem Section */}
       <section id="about" className="py-20 bg-gray-50">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">ስለ ሳሌም</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">{t('about_title')}</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              ሳሌም ሳኮስ በማህበረሰብ ላይ የተመሰረተ የፋይናንስ ተቋም ሲሆን የአባላቱን የኢኮኖሚ ደህንነት ለማሻሻል ይሰራል
+              {t('about_desc')}
             </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">የእኛ ታሪክ እና ራዕይ</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">{t('our_history_vision')}</h3>
               <div className="space-y-4 text-gray-700">
                 <p>
-                  ሳሌም ሳኮስ ከ2015 ዓ.ም ጀምሮ የተቋቋመ ሲሆን ለማህበረሰቡ አባላት ተደራሽ እና ተመጣጣኝ የፋይናንስ አገልግሎት ለመስጠት ይሰራል።
+                  {t('about_history_1')}
                 </p>
                 <p>
-                  የእኛ ራዕይ በማህበረሰባችን ውስጥ የፋይናንስ ማካተት እና የኢኮኖሚ ዕድገትን ማስፋፋት ነው።
+                  {t('about_history_2')}
                 </p>
                 <p>
-                  በተለይም ለሴቶች፣ ለወጣቶች እና ለአነስተኛ ነጋዴዎች የተለየ ትኩረት እንሰጣለን።
+                  {t('about_history_3')}
                 </p>
               </div>
               
               <div className="mt-8 grid grid-cols-2 gap-4">
                 <div className="bg-white p-4 rounded-lg shadow-sm">
                   <Heart className="w-8 h-8 text-red-500 mb-2" />
-                  <h4 className="font-semibold text-gray-900">ማህበረሰብ</h4>
-                  <p className="text-sm text-gray-600">የማህበረሰብ ልማት</p>
+                  <h4 className="font-semibold text-gray-900">{t('about_heart_title')}</h4>
+                  <p className="text-sm text-gray-600">{t('about_heart_desc')}</p>
                 </div>
                 <div className="bg-white p-4 rounded-lg shadow-sm">
                   <Shield className="w-8 h-8 text-blue-500 mb-2" />
-                  <h4 className="font-semibold text-gray-900">አስተማማኝነት</h4>
-                  <p className="text-sm text-gray-600">ደህንነት እና ታማኝነት</p>
+                  <h4 className="font-semibold text-gray-900">{t('about_shield_title')}</h4>
+                  <p className="text-sm text-gray-600">{t('about_shield_desc')}</p>
                 </div>
               </div>
             </div>
 
             <div className="bg-white rounded-2xl p-8 shadow-lg">
-              <h4 className="text-xl font-bold text-gray-900 mb-6">የእኛ እሴቶች</h4>
+              <h4 className="text-xl font-bold text-gray-900 mb-6">{t('our_values')}</h4>
               <div className="space-y-4">
                 {[
-                  'ታማኝነት እና ግልጽነት',
-                  'የማህበረሰብ ልማት',
-                  'የፋይናንስ ማካተት',
-                  'ዘላቂ ዕድገት',
-                  'የአባላት ደህንነት'
+                  t('about_value_1'),
+                  t('about_value_2'),
+                  t('about_value_3'),
+                  t('about_value_4'),
+                  t('about_value_5')
                 ].map((value, index) => (
                   <div key={index} className="flex items-center">
                     <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
@@ -184,8 +186,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
       <section id="services" className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">አገልግሎቶቻችን</h2>
-            <p className="text-xl text-gray-600">ለአባላቶቻችን የምንሰጣቸው ዋና ዋና የፋይናንስ አገልግሎቶች</p>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">{t('services_title')}</h2>
+            <p className="text-xl text-gray-600">{t('services_desc')}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -193,22 +195,22 @@ const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
               <div className="bg-green-500 w-16 h-16 rounded-full flex items-center justify-center mb-6">
                 <PiggyBank className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">ቁጠባ አገልግሎት</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">{t('savings_service')}</h3>
               <p className="text-gray-700 mb-6">
-                የተለያዩ የቁጠባ አይነቶች እና ከፍተኛ የወለድ ተመን
+                {t('savings_service_desc')}
               </p>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                  መደበኛ ቁጠባ
+                  {t('savings_type_regular')}
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                  የጊዜ ተቀማጭ
+                  {t('savings_type_time')}
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                  የልጆች ቁጠባ
+                  {t('savings_type_children')}
                 </li>
               </ul>
             </div>
@@ -217,22 +219,22 @@ const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
               <div className="bg-blue-500 w-16 h-16 rounded-full flex items-center justify-center mb-6">
                 <CreditCard className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">ብድር አገልግሎት</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">{t('loan_service')}</h3>
               <p className="text-gray-700 mb-6">
-                ተመጣጣኝ የወለድ ተመን ያለው የተለያዩ የብድር አይነቶች
+                {t('loan_service_desc')}
               </p>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 text-blue-500 mr-2" />
-                  የንግድ ብድር
+                  {t('loan_type_business')}
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 text-blue-500 mr-2" />
-                  የግል ብድር
+                  {t('loan_type_personal')}
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 text-blue-500 mr-2" />
-                  የቤት ብድር
+                  {t('loan_type_home')}
                 </li>
               </ul>
             </div>
@@ -241,22 +243,22 @@ const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
               <div className="bg-purple-500 w-16 h-16 rounded-full flex items-center justify-center mb-6">
                 <Handshake className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">የገንዘብ ዝውውር</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">{t('transfer_service')}</h3>
               <p className="text-gray-700 mb-6">
-                ፈጣን እና አስተማማኝ የገንዘብ ዝውውር አገልግሎት
+                {t('transfer_service_desc')}
               </p>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 text-purple-500 mr-2" />
-                  የሀገር ውስጥ ዝውውር
+                  {t('transfer_type_domestic')}
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 text-purple-500 mr-2" />
-                  የሞባይል ባንኪንግ
+                  {t('transfer_type_mobile_banking')}
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 text-purple-500 mr-2" />
-                  የቢል ክፍያ
+                  {t('transfer_type_bill_payment')}
                 </li>
               </ul>
             </div>
@@ -268,8 +270,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
       <section id="committees" className="py-20 bg-gray-50">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">ኮሚቴዎቻችን</h2>
-            <p className="text-xl text-gray-600">የሳሌም ሳኮስን የሚመሩ ዋና ዋና ኮሚቴዎች</p>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">{t('committees_title')}</h2>
+            <p className="text-xl text-gray-600">{t('committees_desc')}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -277,18 +279,18 @@ const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
               <div className="bg-green-500 w-16 h-16 rounded-full flex items-center justify-center mb-6 mx-auto">
                 <Building className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">ቦርድ ኮሚቴ</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">{t('board_committee')}</h3>
               <p className="text-gray-700 text-center mb-6">
-                የድርጅቱን አጠቃላይ አመራር እና ስትራቴጂክ አቅጣጫ የሚወስን
+                {t('board_committee_desc')}
               </p>
               <div className="space-y-2 text-sm text-gray-600">
                 <div className="flex items-center justify-center">
                   <Star className="w-4 h-4 text-yellow-500 mr-2" />
-                  <span>ፖሊሲ ማውጣት</span>
+                  <span>{t('policy_making')}</span>
                 </div>
                 <div className="flex items-center justify-center">
                   <Star className="w-4 h-4 text-yellow-500 mr-2" />
-                  <span>ስትራቴጂክ እቅድ</span>
+                  <span>{t('strategic_planning')}</span>
                 </div>
               </div>
             </div>
@@ -297,18 +299,18 @@ const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
               <div className="bg-blue-500 w-16 h-16 rounded-full flex items-center justify-center mb-6 mx-auto">
                 <Shield className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">ክትትል ኮሚቴ</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">{t('audit_committee')}</h3>
               <p className="text-gray-700 text-center mb-6">
-                የድርጅቱን እንቅስቃሴ እና አፈጻጸም የሚከታተል
+                {t('audit_committee_desc')}
               </p>
               <div className="space-y-2 text-sm text-gray-600">
                 <div className="flex items-center justify-center">
                   <Star className="w-4 h-4 text-yellow-500 mr-2" />
-                  <span>የአፈጻጸም ክትትል</span>
+                  <span>{t('performance_monitoring')}</span>
                 </div>
                 <div className="flex items-center justify-center">
                   <Star className="w-4 h-4 text-yellow-500 mr-2" />
-                  <span>የጥራት ቁጥጥር</span>
+                  <span>{t('quality_control')}</span>
                 </div>
               </div>
             </div>
@@ -317,18 +319,18 @@ const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
               <div className="bg-purple-500 w-16 h-16 rounded-full flex items-center justify-center mb-6 mx-auto">
                 <Banknote className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">ብድር ኮሚቴ</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">{t('loan_committee')}</h3>
               <p className="text-gray-700 text-center mb-6">
-                የብድር ጥያቄዎችን የሚገመግም እና የሚወስን
+                {t('loan_committee_desc')}
               </p>
               <div className="space-y-2 text-sm text-gray-600">
                 <div className="flex items-center justify-center">
                   <Star className="w-4 h-4 text-yellow-500 mr-2" />
-                  <span>ብድር ግምገማ</span>
+                  <span>{t('loan_assessment')}</span>
                 </div>
                 <div className="flex items-center justify-center">
                   <Star className="w-4 h-4 text-yellow-500 mr-2" />
-                  <span>ስጋት ትንተና</span>
+                  <span>{t('risk_analysis')}</span>
                 </div>
               </div>
             </div>
@@ -341,42 +343,42 @@ const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-4xl font-bold text-gray-900 mb-6">የአክሲዮን መጠን</h2>
+              <h2 className="text-4xl font-bold text-gray-900 mb-6">{t('share_info_title')}</h2>
               <p className="text-xl text-gray-600 mb-8">
-                ሳሌም ሳኮስ አባል ለመሆን የሚያስፈልጉ የአክሲዮን መጠኖች እና ጥቅሞች
+                {t('share_info_desc')}
               </p>
               
               <div className="space-y-6">
                 <div className="bg-green-50 p-6 rounded-lg border-l-4 border-green-500">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">መሰረታዊ አክሲዮን</h3>
-                  <p className="text-3xl font-bold text-green-600 mb-2">1,000 ብር</p>
-                  <p className="text-gray-700">የመጀመሪያ አባልነት ለመጀመር የሚያስፈልግ ዝቅተኛ መጠን</p>
+                  <p className="text-3xl font-bold text-green-600 mb-2">1,000 {t('birr')}</p>
+                  <p className="text-gray-700">{t('minimum_amount_for_membership')}</p>
                 </div>
                 
                 <div className="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-500">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">መደበኛ አክሲዮን</h3>
-                  <p className="text-3xl font-bold text-blue-600 mb-2">5,000 ብር</p>
-                  <p className="text-gray-700">ሙሉ የአባልነት መብቶች እና ጥቅሞች ለማግኘት</p>
+                  <p className="text-3xl font-bold text-blue-600 mb-2">5,000 {t('birr')}</p>
+                  <p className="text-gray-700">{t('full_membership_benefits')}</p>
                 </div>
                 
                 <div className="bg-purple-50 p-6 rounded-lg border-l-4 border-purple-500">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">ልዩ አክሲዮን</h3>
-                  <p className="text-3xl font-bold text-purple-600 mb-2">10,000+ ብር</p>
-                  <p className="text-gray-700">ተጨማሪ ጥቅሞች እና የድምጽ መብት</p>
+                  <p className="text-3xl font-bold text-purple-600 mb-2">10,000+ {t('birr')}</p>
+                  <p className="text-gray-700">{t('additional_benefits')}</p>
                 </div>
               </div>
             </div>
 
             <div className="bg-gradient-to-br from-green-500 to-blue-600 text-white p-8 rounded-2xl">
-              <h3 className="text-2xl font-bold mb-6">የአክሲዮን ጥቅሞች</h3>
+              <h3 className="text-2xl font-bold mb-6">{t('share_benefits_title')}</h3>
               <div className="space-y-4">
                 {[
-                  'የዓመታዊ ትርፍ ድርሻ',
-                  'የድምጽ መብት በጠቅላላ ጉባኤ',
-                  'ቅድሚያ የሚሰጥ የብድር አገልግሎት',
-                  'የተቀነሰ የአገልግሎት ክፍያ',
-                  'የኢንሹራንስ ሽፋን',
-                  'የቤተሰብ አባላት ጥቅም'
+                  t('annual_profit_share'),
+                  t('voting_rights'),
+                  t('priority_loan_service'),
+                  t('reduced_service_fee'),
+                  t('insurance_coverage'),
+                  t('family_member_benefits')
                 ].map((benefit, index) => (
                   <div key={index} className="flex items-center">
                     <CheckCircle className="w-5 h-5 text-green-300 mr-3 flex-shrink-0" />
@@ -390,7 +392,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
                 className="w-full bg-white text-green-700 py-3 px-6 rounded-lg font-semibold hover:bg-green-50 transition-colors mt-8 flex items-center justify-center"
               >
                 <ArrowRight className="w-5 h-5 mr-2" />
-                አክሲዮን ይግዙ
+                {t('buy_shares')}
               </button>
             </div>
           </div>
@@ -401,8 +403,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
       <section id="savings" className="py-20 bg-gray-50">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">የቁጠባ አይነቶች</h2>
-            <p className="text-xl text-gray-600">ለተለያዩ ፍላጎቶች የተዘጋጁ የቁጠባ አይነቶች</p>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">{t('savings_types_title')}</h2>
+            <p className="text-xl text-gray-600">{t('savings_types_desc')}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -410,40 +412,40 @@ const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
               <div className="bg-green-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
                 <PiggyBank className="w-6 h-6 text-green-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">መደበኛ ቁጠባ</h3>
-              <p className="text-gray-600 text-sm mb-4">በማንኛውም ጊዜ ማውጣት የሚቻል</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('savings_type_regular')}</h3>
+              <p className="text-gray-600 text-sm mb-4">{t('savings_type_regular_desc')}</p>
               <div className="text-2xl font-bold text-green-600 mb-2">8%</div>
-              <p className="text-xs text-gray-500">የዓመታዊ ወለድ</p>
+              <p className="text-xs text-gray-500">{t('annual_interest')}</p>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
               <div className="bg-blue-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
                 <TrendingUp className="w-6 h-6 text-blue-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">የጊዜ ተቀማጭ</h3>
-              <p className="text-gray-600 text-sm mb-4">6 ወር እና ከዚያ በላይ</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('savings_type_time')}</h3>
+              <p className="text-gray-600 text-sm mb-4">{t('savings_type_time_desc')}</p>
               <div className="text-2xl font-bold text-blue-600 mb-2">12%</div>
-              <p className="text-xs text-gray-500">የዓመታዊ ወለድ</p>
+              <p className="text-xs text-gray-500">{t('annual_interest')}</p>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
               <div className="bg-purple-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
                 <Heart className="w-6 h-6 text-purple-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">የልጆች ቁጠባ</h3>
-              <p className="text-gray-600 text-sm mb-4">ለ18 ዓመት በታች</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('savings_type_children')}</h3>
+              <p className="text-gray-600 text-sm mb-4">{t('savings_type_children_desc')}</p>
               <div className="text-2xl font-bold text-purple-600 mb-2">10%</div>
-              <p className="text-xs text-gray-500">የዓመታዊ ወለድ</p>
+              <p className="text-xs text-gray-500">{t('annual_interest')}</p>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
               <div className="bg-yellow-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
                 <Star className="w-6 h-6 text-yellow-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">ልዩ ቁጠባ</h3>
-              <p className="text-gray-600 text-sm mb-4">ለተለዩ ዓላማዎች</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('savings_type_special')}</h3>
+              <p className="text-gray-600 text-sm mb-4">{t('savings_type_special_desc')}</p>
               <div className="text-2xl font-bold text-yellow-600 mb-2">15%</div>
-              <p className="text-xs text-gray-500">የዓመታዊ ወለድ</p>
+              <p className="text-xs text-gray-500">{t('annual_interest')}</p>
             </div>
           </div>
         </div>
@@ -453,8 +455,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
       <section className="py-20 bg-green-600 text-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">ያግኙን</h2>
-            <p className="text-xl text-green-100">ለማንኛውም ጥያቄ እና መረጃ እኛን ያግኙን</p>
+            <h2 className="text-4xl font-bold mb-4">{t('contact_section_title')}</h2>
+            <p className="text-xl text-green-100">{t('contact_section_desc')}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -462,7 +464,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
               <div className="bg-white/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Phone className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">ስልክ</h3>
+              <h3 className="text-xl font-semibold mb-2">{t('phone')}</h3>
               <p className="text-green-100">+251 910 4169 32</p>
               <p className="text-green-100">+251 911 123 456</p>
             </div>
@@ -471,7 +473,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
               <div className="bg-white/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Mail className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">ኢሜይል</h3>
+              <h3 className="text-xl font-semibold mb-2">{t('email_address')}</h3>
               <p className="text-green-100">info@salemsaccos.com</p>
               <p className="text-green-100">support@salemsaccos.com</p>
             </div>
@@ -480,30 +482,30 @@ const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
               <div className="bg-white/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <MapPin className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">አድራሻ</h3>
-              <p className="text-green-100">አዲስ አበባ፣ ኢትዮጵያ</p>
-              <p className="text-green-100">ቦሌ ክፍለ ከተማ</p>
+              <h3 className="text-xl font-semibold mb-2">{t('address')}</h3>
+              <p className="text-green-100">{t('addis_ababa_ethiopia')}</p>
+              <p className="text-green-100">{t('bole_subcity')}</p>
             </div>
           </div>
 
           <div className="mt-16 text-center">
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 max-w-2xl mx-auto">
-              <h3 className="text-2xl font-bold mb-4">የቢዝነስ ሰዓታት</h3>
+              <h3 className="text-2xl font-bold mb-4">{t('working_hours')}</h3>
               <button
                 onClick={onContactClick}
                 className="mb-6 bg-white text-green-600 px-6 py-3 rounded-lg font-semibold hover:bg-green-50 transition-colors"
               >
-                ዝርዝር መረጃ ይመልከቱ
+                {t('view_details')}
               </button>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-green-100">
                 <div>
-                  <p className="font-semibold">ሰኞ - አርብ</p>
-                  <p>8:00 ጠዋት - 5:00 ከሰዓት</p>
+                  <p className="font-semibold">{t('monday_friday_short')}</p>
+                  <p>8:00 {t('am')} - 5:00 {t('pm')}</p>
                 </div>
                 
                 <div>
-                  <p className="font-semibold">ቅዳሜ</p>
-                  <p>8:00 ጠዋት - 12:00 ቀትር</p>
+                  <p className="font-semibold">{t('saturday')}</p>
+                  <p>8:00 {t('am')} - 12:00 {t('noon')}</p>
                 </div>
               </div>
             </div>
