@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Student Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #f59e0b;
+            --light-color: #f8fafc;
+            --dark-color: #1e293b;
+            --text-color: #334155;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f1f5f9;
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header & Navigation */
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            color: var(--accent-color);
+        }
+
+        nav {
+            display: flex;
+            gap: 5px;
+        }
+
+        .nav-item {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            transition: var(--transition);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .nav-item.active-nav {
+            background-color: var(--accent-color);
+            color: var(--dark-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Main Content Area */
+        .app-container {
+            min-height: calc(100vh - 180px);
+            padding: 40px 0;
+        }
+
+        .page-content {
+            background-color: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            color: var(--secondary-color);
+            margin-bottom: 25px;
+            font-size: 2.5rem;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 70px;
+            height: 4px;
+            background-color: var(--accent-color);
+            border-radius: 2px;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin: 25px 0 15px;
+            font-size: 1.8rem;
+        }
+
+        h3 {
+            color: var(--dark-color);
+            margin: 20px 0 10px;
+            font-size: 1.4rem;
+        }
+
+        /* Home Page */
+        .hero {
+            text-align: center;
+            padding: 40px 0 20px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            color: var(--text-color);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 150px;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* About Page */
+        .team-members {
+            display: flex;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .member-card {
+            flex: 1;
+            min-width: 250px;
+            background-color: var(--light-color);
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+        }
+
+        .member-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .member-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+        }
+
+        .member-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+
+        .member-id {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .skill-tag {
+            background-color: #e0f2fe;
+            color: var(--primary-color);
+            padding: 8px 15px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Projects Page */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .project-card {
+            background-color: var(--light-color);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .project-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+        }
+
+        .project-title {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+
+        .project-tech {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .project-body {
+            padding: 20px;
+        }
+
+        .project-status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+
+        .status-complete {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-in-progress {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .project-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-3px);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        /* Contact Page */
+        .contact-container {
+            display: flex;
+            gap: 40px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .contact-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .contact-form {
+            flex: 2;
+            min-width: 300px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: var(--light-color);
+            border-radius: 10px;
+        }
+
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+        }
+
+        /* Toast Notification */
+        .toast-message {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #10b981;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .social-link:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-3px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            nav {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .page-content {
+                padding: 25px;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+            }
+        }
+
+        /* Dark Mode Toggle */
+        .theme-toggle {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-left: 20px;
+        }
+
+        .dark-mode {
+            background-color: #0f172a;
+            color: #cbd5e1;
+        }
+
+        .dark-mode .page-content,
+        .dark-mode .member-card,
+        .dark-mode .project-card,
+        .dark-mode .contact-item {
+            background-color: #1e293b;
+            color: #cbd5e1;
+        }
+
+        .dark-mode .skill-tag {
+            background-color: #334155;
+            color: #e2e8f0;
+        }
+
+        .dark-mode .form-control {
+            background-color: #334155;
+            border-color: #475569;
+            color: #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header and Navigation -->
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>University Portfolio</span>
+            </div>
+            <nav>
+                <a href="#" onclick="navigate('home', event)" id="nav-home" class="nav-item active-nav">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="#" onclick="navigate('about', event)" id="nav-about" class="nav-item">
+                    <i class="fas fa-users"></i> About
+                </a>
+                <a href="#" onclick="navigate('projects', event)" id="nav-projects" class="nav-item">
+                    <i class="fas fa-code"></i> Projects
+                </a>
+                <a href="#" onclick="navigate('contact', event)" id="nav-contact" class="nav-item">
+                    <i class="fas fa-envelope"></i> Contact
+                </a>
+                <button class="theme-toggle" id="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="app-container container" id="app-container">
+        <!-- Content will be injected here by JavaScript -->
+    </main>
+
+    <!-- Toast / Notification Area -->
+    <div id="toast-message" class="toast-message"></div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container footer-content">
+            <p>© 2025 University Portfolio Website | Internet Programming Project</p>
+            <div class="social-links">
+                <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const appContainer = document.getElementById('app-container');
+        const toastMessage = document.getElementById('toast-message');
+        const themeToggle = document.getElementById('theme-toggle');
+        
+        // Page content mapping with enhanced content
+        const pages = {
+            // Home Page
+            'home': {
+                title: 'University Student Portfolio',
+                content: `
+                    <div class="hero">
+                        <h1>Welcome to Our Portfolio</h1>
+                        <p>This portfolio showcases our journey as computer science students learning web development. We're passionate about creating clean, functional, and user-friendly web applications.</p>
+                        <div class="stats">
+                            <div class="stat-item">
+                                <span class="stat-number" id="project-count">6</span>
+                                <span class="stat-label">Projects Completed</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="skill-count">12</span>
+                                <span class="stat-label">Skills Mastered</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="experience-count">2</span>
+                                <span class="stat-label">Years of Experience</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h2>Our Mission</h2>
+                    <p>As university students in the Internet Programming course, we aim to develop practical web development skills while building a portfolio that demonstrates our growing expertise. We focus on responsive design, clean code, and user experience.</p>
+                    
+                    <h2>What We're Learning</h2>
+                    <div class="skills-list">
+                        <span class="skill-tag">HTML5 & Semantic Markup</span>
+                        <span class="skill-tag">CSS3 & Flexbox/Grid</span>
+                        <span class="skill-tag">JavaScript (ES6+)</span>
+                        <span class="skill-tag">DOM Manipulation</span>
+                        <span class="skill-tag">Responsive Web Design</span>
+                        <span class="skill-tag">Git & Version Control</span>
+                        <span class="skill-tag">API Integration</span>
+                        <span class="skill-tag">UI/UX Principles</span>
+                    </div>
+                `
+            },
+            
+            // About Page
+            'about': {
+                title: 'About Our Team',
+                content: `
+                    <p>We are two dedicated computer science students passionate about web development and software engineering. This portfolio represents our collaborative effort in learning and applying modern web technologies.</p>
+                    
+                    <div class="team-members">
+                        <div class="member-card">
+                            <div class="member-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h3 class="member-name">Haileysus Abera</h3>
+                            <div class="member-id">RCD/2572/16</div>
+                            <p>Frontend developer with a keen eye for design and user experience. Specializes in responsive layouts and interactive JavaScript features.</p>
+                            <div class="skills-list">
+                                <span class="skill-tag">JavaScript</span>
+                                <span class="skill-tag">CSS/SCSS</span>
+                                <span class="skill-tag">React</span>
+                                <span class="skill-tag">UI Design</span>
+                            </div>
+                        </div>
+                        
+                        <div class="member-card">
+                            <div class="member-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h3 class="member-name">Eliyas Tegegn</h3>
+                            <div class="member-id">RCD/2576/16</div>
+                            <p>Backend-focused developer with strong problem-solving skills. Enjoys creating efficient algorithms and database structures.</p>
+                            <div class="skills-list">
+                                <span class="skill-tag">Python</span>
+                                <span class="skill-tag">Node.js</span>
+                                <span class="skill-tag">Database Design</span>
+                                <span class="skill-tag">API Development</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h2>Our Academic Journey</h2>
+                    <p>We are currently in our third year of Computer Science studies, focusing on web technologies, algorithms, and software engineering principles. This portfolio project is part of our Internet Programming course where we apply theoretical knowledge to practical projects.</p>
+                    
+                    <h2>Collaboration Philosophy</h2>
+                    <p>We believe in agile development practices, regular code reviews, and pair programming to ensure code quality and shared understanding. Our workflow includes GitHub for version control and project management tools to track progress.</p>
+                `
+            },
+            
+            // Projects Page
+            'projects': {
+                title: 'Our Projects',
+                content: `
+                    <p>Here are some of the projects we've developed during our studies. Each project demonstrates specific skills and technologies we've learned.</p>
+                    
+                    <div class="projects-grid">
+                        <div class="project-card">
+                            <div class="project-header">
+                                <h3 class="project-title">Interactive Calculator</h3>
+                                <div class="project-tech">HTML, CSS, JavaScript</div>
+                            </div>
+                            <div class="project-body">
+                                <p>A fully functional calculator with basic arithmetic operations, memory functions, and keyboard support.</p>
+                                <div class="project-status status-complete">Completed</div>
+                                <div class="project-actions">
+                                    <button class="btn btn-primary" onclick="showProjectDemo('calculator')">
+                                        <i class="fas fa-play-circle"></i> Demo
+                                    </button>
+                                    <button class="btn btn-outline" onclick="showToast('Code repository will open in a new tab')">
+                                        <i class="fab fa-github"></i> Code
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="project-card">
+                            <div class="project-header">
+                                <h3 class="project-title">Student Database System</h3>
+                                <div class="project-tech">JavaScript, LocalStorage, Bootstrap</div>
+                            </div>
+                            <div class="project-body">
+                                <p>A CRUD application for managing student records with search, filter, and export capabilities.</p>
+                                <div class="project-status status-complete">Completed</div>
+                                <div class="project-actions">
+                                    <button class="btn btn-primary" onclick="showProjectDemo('student-db')">
+                                        <i class="fas fa-play-circle"></i> Demo
+                                    </button>
+                                    <button class="btn btn-outline" onclick="showToast('Code repository will open in a new tab')">
+                                        <i class="fab fa-github"></i> Code
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="project-card">
+                            <div class="project-header">
+                                <h3 class="project-title">Weather Dashboard</h3>
+                                <div class="project-tech">API Integration, Async JavaScript</div>
+                            </div>
+                            <div class="project-body">
+                                <p>A weather application that fetches data from a public API and displays forecasts with interactive charts.</p>
+                                <div class="project-status status-in-progress">In Progress</div>
+                                <div class="project-actions">
+                                    <button class="btn btn-primary" onclick="showProjectDemo('weather-app')">
+                                        <i class="fas fa-play-circle"></i> Preview
+                                    </button>
+                                    <button class="btn btn-outline" onclick="showToast('Code repository will open in a new tab')">
+                                        <i class="fab fa-github"></i> Code
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="project-card">
+                            <div class="project-header">
+                                <h3 class="project-title">E-commerce Product Page</h3>
+                                <div class="project-tech">React, CSS Modules, Mock API</div>
+                            </div>
+                            <div class="project-body">
+                                <p>A responsive product page with shopping cart functionality, product gallery, and user reviews.</p>
+                                <div class="project-status status-in-progress">In Progress</div>
+                                <div class="project-actions">
+                                    <button class="btn btn-primary" onclick="showProjectDemo('ecommerce')">
+                                        <i class="fas fa-play-circle"></i> Preview
+                                    </button>
+                                    <button class="btn btn-outline" onclick="showToast('Code repository will open in a new tab')">
+                                        <i class="fab fa-github"></i> Code
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h2>Upcoming Projects</h2>
+                    <ul>
+                        <li>Real-time Chat Application with WebSockets</li>
+                        <li>Task Management Dashboard with Drag & Drop</li>
+                        <li>Expense Tracker with Data Visualization</li>
+                        <li>University Course Registration System</li>
+                    </ul>
+                `
+            },
+            
+            // Contact Page
+            'contact': {
+                title: 'Get In Touch',
+                content: `
+                    <div class="contact-container">
+                        <div class="contact-info">
+                            <h2>Contact Information</h2>
+                            <p>We're open to collaboration, internship opportunities, or just chatting about web development!</p>
+                            
+                            <div class="contact-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-university"></i>
+                                </div>
+                                <div>
+                                    <h3>University</h3>
+                                    <p>St. Mary's University</p>
+                                    <p>Department of Computer Science</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div>
+                                    <h3>Email</h3>
+                                    <p>haileysus.abera@student.edu.et</p>
+                                    <p>eliyas.tegegn@student.edu.et</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div>
+                                    <h3>Phone</h3>
+                                    <p>+251 91 234 5678</p>
+                                    <p>+251 92 345 6789</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div>
+                                    <h3>Location</h3>
+                                    <p>Addis Ababa, Ethiopia</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-form">
+                            <h2>Send Us a Message</h2>
+                            <form id="contact-form">
+                                <div class="form-group">
+                                    <label for="name">Full Name *</label>
+                                    <input type="text" id="name" name="name" class="form-control" placeholder="Enter your full name" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="email">University Email *</label>
+                                    <input type="email" id="email" name="email" class="form-control" placeholder="your.name@student.aau.edu.et" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="subject">Subject</label>
+                                    <select id="subject" name="subject" class="form-control">
+                                        <option value="">Select a subject</option>
+                                        <option value="collaboration">Project Collaboration</option>
+                                        <option value="internship">Internship Opportunity</option>
+                                        <option value="feedback">Portfolio Feedback</option>
+                                        <option value="other">Other Inquiry</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="message">Message *</label>
+                                    <textarea id="message" name="message" class="form-control" placeholder="Type your message here..." required></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>
+                                        <input type="checkbox" id="newsletter" name="newsletter">
+                                        Subscribe to our development newsletter
+                                    </label>
+                                </div>
+                                
+                                <button type="submit" class="submit-btn">
+                                    <i class="fas fa-paper-plane"></i> Send Message
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                `
+            }
+        };
+        
+        // Toast notification function
+        function showToast(message, type = 'success') {
+            toastMessage.textContent = message;
+            toastMessage.style.display = 'flex';
+            
+            // Set color based on type
+            if (type === 'error') {
+                toastMessage.style.backgroundColor = '#ef4444';
+            } else if (type === 'warning') {
+                toastMessage.style.backgroundColor = '#f59e0b';
+            } else {
+                toastMessage.style.backgroundColor = '#10b981';
+            }
+            
+            // Hide after 4 seconds
+            setTimeout(() => {
+                toastMessage.style.display = 'none';
+            }, 4000);
+        }
+        
+        // Project demo function
+        function showProjectDemo(projectName) {
+            showToast(`Launching ${projectName.replace('-', ' ')} demo...`, 'warning');
+            // In a real application, this would open the actual project
+            // For now, we'll simulate loading
+            setTimeout(() => {
+                showToast(`Project demo loaded successfully!`, 'success');
+            }, 1500);
+        }
+        
+        // Main rendering function
+        function renderPage(pageName) {
+            const pageData = pages[pageName];
+            if (!pageData) return;
+            
+            // Create page content
+            const contentWrapper = document.createElement('div');
+            contentWrapper.className = 'page-content';
+            contentWrapper.innerHTML = `<h1>${pageData.title}</h1>${pageData.content}`;
+            
+            // Clear and add new content with fade animation
+            appContainer.innerHTML = '';
+            appContainer.appendChild(contentWrapper);
+            
+            // Update active navigation link
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active-nav');
+            });
+            
+            const activeNav = document.getElementById(`nav-${pageName}`);
+            if (activeNav) {
+                activeNav.classList.add('active-nav');
+            }
+            
+            // Re-attach form listener if on contact page
+            if (pageName === 'contact') {
+                const form = document.getElementById('contact-form');
+                if (form) {
+                    form.addEventListener('submit', handleFormSubmit);
+                }
+            }
+            
+            // Animate stats on home page
+            if (pageName === 'home') {
+                setTimeout(animateStats, 300);
+            }
+            
+            // Scroll to top of page
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Form submission handler
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value;
+            
+            // Simple validation
+            if (!name || !email || !message) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            // Simulate form submission
+            showToast('Sending your message...', 'warning');
+            
+            setTimeout(() => {
+                // In a real application, this would be an AJAX call to a server
+                showToast(`Message sent successfully! We'll respond to ${email} within 48 hours.`, 'success');
+                
+                // Reset form
+                document.getElementById('contact-form').reset();
+                
+                // Log form data (for demonstration)
+                console.log('Form submitted:', { name, email, subject, message });
+            }, 2000);
+        }
+        
+        // Animate statistics on home page
+        function animateStats() {
+            const counters = [
+                { element: document.getElementById('project-count'), target: 8, duration: 2000 },
+                { element: document.getElementById('skill-count'), target: 14, duration: 2000 },
+                { element: document.getElementById('experience-count'), target: 3, duration: 2000 }
+            ];
+            
+            counters.forEach(counter => {
+                if (!counter.element) return;
+                
+                let current = 0;
+                const increment = counter.target / (counter.duration / 16); // 60fps
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= counter.target) {
+                        current = counter.target;
+                        clearInterval(timer);
+                    }
+                    counter.element.textContent = Math.floor(current);
+                }, 16);
+            });
+        }
+        
+        // Navigation function
+        function navigate(page, event) {
+            if (event) event.preventDefault();
+            renderPage(page);
+            
+            // Update browser URL without reloading (for demo purposes)
+            history.pushState({ page }, '', `#${page}`);
+        }
+        
+        // Theme toggle functionality
+        function initTheme() {
+            const savedTheme = localStorage.getItem('portfolio-theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+            
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                
+                if (document.body.classList.contains('dark-mode')) {
+                    localStorage.setItem('portfolio-theme', 'dark');
+                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                } else {
+                    localStorage.setItem('portfolio-theme', 'light');
+                    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                }
+            });
+        }
+        
+        // Initialize the application
+        function initApp() {
+            // Check URL hash for page
+            const hash = window.location.hash.substring(1);
+            const initialPage = pages[hash] ? hash : 'home';
+            
+            // Render initial page
+            renderPage(initialPage);
+            
+            // Initialize theme
+            initTheme();
+            
+            // Handle browser back/forward buttons
+            window.addEventListener('popstate', (event) => {
+                if (event.state && event.state.page) {
+                    renderPage(event.state.page);
+                }
+            });
+        }
+        
+        // Initialize when page loads
+        window.onload = initApp;
+    </script>
+</body>
+</html>

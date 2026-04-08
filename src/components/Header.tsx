@@ -1,340 +1,227 @@
 // components/Header.tsx
-import React, { useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
-import { Building, Mail, Phone, Menu, X, ChevronDown, Globe, UserPlus, Home } from 'lucide-react'
-import { useLocation } from 'react-router-dom'
+import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Menu, X, Globe, UserPlus, ChevronDown, Rocket } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
-  handleScrollToSection?: (sectionId: string) => void
-  setIsContactModalOpen?: (open: boolean) => void
+  handleScrollToSection?: (sectionId: string) => void;
+  setIsContactModalOpen?: (open: boolean) => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ 
-  handleScrollToSection, 
-  setIsContactModalOpen 
+  handleScrollToSection
 }) => {
-  const { t, i18n } = useTranslation()
-  const location = useLocation()
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false)
+  const { t, i18n } = useTranslation();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
 
-  // Determine current view based on route
-  const currentView = location.pathname === '/' ? 'home' : 
-                     location.pathname === '/register' ? 'register' : 'members'
+  const isHomePage = location.pathname === '/';
 
-  // Handle scroll effect
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10)
-    }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  // Close mobile menu on route change
   useEffect(() => {
-    setIsMobileMenuOpen(false)
-    setIsLanguageMenuOpen(false)
-  }, [location.pathname])
-
-  const handleNavigation = (path: string) => {
-    window.location.href = path
-  }
-
-  const handleSectionClick = (sectionId: string) => {
-    if (sectionId === 'contact' && setIsContactModalOpen) {
-      setIsContactModalOpen(true)
-    } else if (handleScrollToSection) {
-      handleScrollToSection(sectionId)
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
     }
-    setIsMobileMenuOpen(false)
-  }
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [isMobileMenuOpen]);
 
   const handleLanguageChange = (lng: string) => {
-    i18n.changeLanguage(lng)
-    setIsLanguageMenuOpen(false)
-  }
+    i18n.changeLanguage(lng);
+    setIsLanguageMenuOpen(false);
+  };
 
-  const navigationItems = [
-    { id: 'about', label: t('about'), icon: null },
-    { id: 'services', label: t('services'), icon: null },
-    { id: 'committees', label: t('committees'), icon: null },
-    { id: 'shares', label: t('shares'), icon: null },
-    { id: 'savings', label: t('savings'), icon: null },
-    { 
-      id: 'contact', 
-      label: t('contact_us'), 
-      icon: null,
-      action: () => setIsContactModalOpen?.(true)
-    },
-  ]
+  const navItems = [
+    { id: 'about', label: t('about') },
+    { id: 'services', label: t('services') },
+    { id: 'shares', label: t('shares') },
+    { id: 'contact', label: t('contact_us') },
+  ];
 
-  const languages = [
-    { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'am', name: 'አማርኛ', flag: '🇪🇹' },
-  ]
 
   return (
-    <>
-      <header className={`sticky top-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-white'
-      }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-20">
-            {/* Logo Section */}
+    <header 
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        isScrolled ? 'bg-white/90 backdrop-blur-xl border-b border-gray-100 py-3 shadow-md' : 'bg-transparent py-5'
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+        
+        {/* Modern Logo */}
+        <div 
+          onClick={() => navigate('/')}
+          className="flex items-center gap-3 cursor-pointer group"
+        >
+          <div className="relative">
+            <img 
+              src="/image/logo.jpg" 
+              alt="Salem Logo" 
+              className="w-11 h-11 rounded-full border-2 border-white shadow-md group-hover:scale-110 transition-transform object-cover" 
+            />
+            <div className="absolute inset-0 rounded-full border border-primary/10"></div>
+          </div>
+          <span className={`text-xl font-black tracking-tighter ${isScrolled ? 'text-primary' : (isHomePage ? 'text-gray-400' : 'text-primary')}`}>
+            SALEM<span className="text-accent">SACCOS</span>
+          </span>
+        </div>
+
+        {/* Desktop Nav */}
+        <nav className="hidden lg:flex items-center gap-8">
+          {isHomePage && navItems.map((item) => (
             <button
-              className="flex items-center space-x-3 group focus:outline-none"
-              onClick={() => handleNavigation('/')}
-              aria-label="Go to home"
-              style={{ background: 'none', border: 'none', padding: 0, margin: 0 }}
-              type="button"
+              key={item.id}
+              onClick={() => handleScrollToSection?.(item.id)}
+              className={`text-sm font-bold tracking-wide uppercase transition-colors hover:text-accent ${
+                isScrolled ? 'text-gray-600' : (isHomePage ? 'text-gray-400' : 'text-gray-600')
+              }`}
             >
-              <div className="relative">
-                <div className="bg-gradient-to-br from-green-500 to-emerald-600 p-2.5 rounded-xl shadow-md group-hover:shadow-lg transition-shadow">
-                  <Building className="w-6 h-6 text-white" />
-                </div>
-                <div className="absolute -inset-1 bg-gradient-to-r from-green-400 to-emerald-400 rounded-xl opacity-0 group-hover:opacity-20 blur transition-opacity" />
-              </div>
-              <div className="text-left">
-                <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-emerald-800 bg-clip-text text-transparent">
-                  {t('saccos')}
-                </h1>
-                <p className="text-xs text-gray-500">
-                  {t('trusted')} • {t('years_in_service')}
-                </p>
-              </div>
+              {item.label}
             </button>
+          ))}
+          
+          <div className="h-4 w-px bg-gray-300/30 mx-2"></div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-1 text-xs">
-              {/* Home Button */}
-              <button
-                onClick={() => handleNavigation('/')}
-                className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl transition-all duration-200 ${
-                  currentView === 'home'
-                    ? 'bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 border border-green-100'
-                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                }`}
+          {/* Language Switcher */}
+          <div className="relative">
+            <button
+              onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
+              className={`flex items-center gap-1 text-sm font-bold uppercase transition-colors hover:text-accent ${
+                isScrolled ? 'text-gray-600' : (isHomePage ? 'text-gray-400' : 'text-gray-600')
+              }`}
+            >
+              <Globe size={16} />
+              {i18n.language === 'en' ? 'EN' : 'AM'}
+              <ChevronDown size={14} className={isLanguageMenuOpen ? 'rotate-180' : ''} />
+            </button>
+            {isLanguageMenuOpen && (
+              <div className="absolute right-0 mt-3 w-40 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden py-2 animate-fadeIn">
+                {['en', 'am'].map((lng) => (
+                  <button
+                    key={lng}
+                    onClick={() => handleLanguageChange(lng)}
+                    className="w-full px-4 py-2.5 text-left text-sm font-bold hover:bg-gray-50 text-gray-700 flex justify-between items-center"
+                  >
+                    <span>{lng === 'en' ? 'English' : 'አማርኛ'}</span>
+                    {i18n.language === lng && <div className="w-1.5 h-1.5 rounded-full bg-accent"></div>}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* CTA */}
+          <button
+            onClick={() => navigate('/register')}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-sm shadow-lg transition-all active:scale-95 ${
+              isScrolled ? 'bg-primary text-white shadow-primary/20' : (isHomePage ? 'bg-white text-primary shadow-white/10' : 'bg-primary text-white shadow-primary/20')
+            }`}
+          >
+            <UserPlus size={16} />
+            {t('add_member')}
+          </button>
+        </nav>
+
+        {/* Mobile Toggle */}
+        <button 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className={`lg:hidden p-2 rounded-xl transition-all duration-300 ${
+            isScrolled ? 'text-gray-800 bg-gray-100/50' : (isHomePage ? 'text-gray-600 bg-white/50 backdrop-blur-sm' : 'text-primary bg-primary/5')
+          }`}
+        >
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+
+      </div>
+
+      {/* Mobile Menu Overlay - Cuter & Functional */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-[60] lg:hidden animate-fadeIn">
+          {/* Backdrop Blur */}
+          <div 
+            className="absolute inset-0 bg-primary/20 backdrop-blur-md"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+          
+          {/* Menu Panel */}
+          <div className="absolute top-4 left-4 right-4 bg-white/95 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/20 p-8 flex flex-col max-h-[90vh] overflow-y-auto animate-slideDown">
+            <div className="flex justify-between items-center mb-10">
+              <div className="flex items-center gap-3">
+                <img src="/image/logo.jpg" alt="Logo" className="w-10 h-10 rounded-full border shadow-sm" />
+                <span className="text-xl font-black text-primary">SALEM<span className="text-accent">SACCOS</span></span>
+              </div>
+              <button 
+                onClick={() => setIsMobileMenuOpen(false)} 
+                className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-800 hover:rotate-90 transition-transform duration-300"
               >
-                <Home className="w-4 h-4" />
-                <span className="font-medium">{t('home')}</span>
+                <X size={24} />
               </button>
+            </div>
 
-              {/* Landing Page Sections */}
-              {currentView === 'home' && (
-                <div className="flex items-center space-x-1 text-xs">
-                  {navigationItems.map((item) => (
+            <div className="flex flex-col gap-5">
+              {isHomePage ? (
+                <>
+                  {navItems.map((item) => (
                     <button
                       key={item.id}
-                      onClick={() => handleSectionClick(item.id)}
-                      className="px-3 py-2 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all duration-200 font-medium"
-                      style={{ fontSize: '0.85rem' }}
+                      onClick={() => {
+                        handleScrollToSection?.(item.id);
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="text-3xl font-black text-gray-800 text-left hover:text-primary active:scale-95 transition-all py-2 border-b border-gray-50 last:border-0"
                     >
                       {item.label}
                     </button>
                   ))}
-                </div>
+                </>
+              ) : (
+                <button
+                  onClick={() => { navigate('/'); setIsMobileMenuOpen(false); }}
+                  className="text-3xl font-black text-gray-800 text-left hover:text-primary transition-all py-2"
+                >
+                  {t('home')}
+                </button>
               )}
 
-              {/* Register Button */}
+              <hr className="border-gray-100 my-4" />
+
               <button
-                onClick={() => handleNavigation('/register')}
-                className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl transition-all duration-200 ml-2 ${
-                  currentView === 'register'
-                    ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-md'
-                    : 'bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:shadow-md hover:from-green-600 hover:to-emerald-600'
-                }`}
+                onClick={() => { navigate('/register'); setIsMobileMenuOpen(false); }}
+                className="bg-primary text-white p-5 rounded-2xl text-xl font-bold flex items-center justify-center gap-3 shadow-xl shadow-primary/20 active:scale-95 transition-all"
               >
-                <UserPlus className="w-4 h-4" />
-                <span className="font-medium">{t('add_member')}</span>
+                <Rocket size={24} />
+                {t('add_member')}
               </button>
 
-              {/* Language Selector */}
-              <div className="relative ml-2">
-                <button
-                  onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
-                  className="flex items-center space-x-2 px-3 py-2.5 text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-200 border border-gray-200"
-                >
-                  <Globe className="w-4 h-4" />
-                  <span className="font-medium">
-                    {i18n.language === 'en' ? 'EN' : 'AM'}
-                  </span>
-                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${
-                    isLanguageMenuOpen ? 'rotate-180' : ''
-                  }`} />
-                </button>
-
-                {/* Language Dropdown */}
-                {isLanguageMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
-                    {languages.map((lang) => (
-                      <button
-                        key={lang.code}
-                        onClick={() => handleLanguageChange(lang.code)}
-                        className={`flex items-center space-x-3 w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
-                          i18n.language === lang.code ? 'bg-green-50 text-green-700' : 'text-gray-700'
-                        }`}
-                      >
-                        <span className="text-xl">{lang.flag}</span>
-                        <span className="font-medium">{lang.name}</span>
-                        {i18n.language === lang.code && (
-                          <div className="ml-auto w-2 h-2 bg-green-500 rounded-full" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                )}
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <button onClick={() => handleLanguageChange('en')} className={`p-4 rounded-xl border-2 font-black tracking-widest transition-all ${i18n.language === 'en' ? 'bg-secondary border-primary text-primary' : 'border-gray-100 text-gray-400'}`}>ENG</button>
+                <button onClick={() => handleLanguageChange('am')} className={`p-4 rounded-xl border-2 font-black tracking-widest transition-all ${i18n.language === 'am' ? 'bg-secondary border-primary text-primary' : 'border-gray-100 text-gray-400'}`}>አማር</button>
               </div>
-            </nav>
 
-            {/* Mobile Menu Button */}
-            <div className="lg:hidden flex items-center space-x-2">
-              {/* Language Switcher - Mobile */}
-              <button
-                onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
-                className="p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <Globe className="w-5 h-5" />
-              </button>
-
-              {/* Mobile Menu Toggle */}
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors relative"
-                aria-label="Toggle mobile menu"
-              >
-                {isMobileMenuOpen ? (
-                  <X className="w-6 h-6" />
-                ) : (
-                  <Menu className="w-6 h-6" />
-                )}
-              </button>
+              {/* Cute interaction area */}
+              <div className="mt-8 p-6 bg-gray-50 rounded-3xl text-center">
+                <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">{t('stay_connected')}</p>
+                <div className="flex justify-center gap-6 text-gray-400">
+                   <Globe size={20} />
+                   <Rocket size={20} />
+                   <Globe size={20} />
+                </div>
+              </div>
             </div>
           </div>
         </div>
-
-        {/* Language Menu - Mobile */}
-        {isLanguageMenuOpen && (
-          <div className="lg:hidden bg-white border-t border-gray-200 px-4 py-3">
-            <div className="flex space-x-2">
-              {languages.map((lang) => (
-                <button
-                  key={lang.code}
-                  onClick={() => handleLanguageChange(lang.code)}
-                  className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2.5 rounded-lg border transition-colors ${
-                    i18n.language === lang.code
-                      ? 'bg-green-50 text-green-700 border-green-200'
-                      : 'text-gray-700 border-gray-200 hover:bg-gray-50'
-                  }`}
-                >
-                  <span className="text-lg">{lang.flag}</span>
-                  <span className="font-medium">{lang.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-      </header>
-
-      {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <>
-          {/* Backdrop */}
-          <div 
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 lg:hidden"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
-          
-          {/* Mobile Menu Panel */}
-          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-white shadow-xl z-50 lg:hidden transform transition-transform duration-300 ease-out">
-            <div className="h-full overflow-y-auto">
-              {/* Menu Header with Close Icon */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                <div className="flex items-center space-x-3">
-                  <div className="bg-gradient-to-br from-green-500 to-emerald-600 p-2.5 rounded-xl">
-                    <Building className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-bold text-gray-900">{t('saccos')}</h2>
-                    <p className="text-sm text-gray-500">{t('saccos_desc')}</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
-                  aria-label="Close menu"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-
-              {/* Navigation Items */}
-              <div className="p-4 space-y-1">
-                {/* Home */}
-                <button
-                  onClick={() => handleNavigation('/')}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-colors ${
-                    currentView === 'home'
-                      ? 'bg-green-50 text-green-700'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`}
-                >
-                  <Home className="w-5 h-5" />
-                  <span className="font-medium">{t('home')}</span>
-                </button>
-
-                {/* Landing Page Sections */}
-                {currentView === 'home' && navigationItems.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => handleSectionClick(item.id)}
-                    className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left text-gray-700 hover:bg-gray-50 transition-colors"
-                  >
-                    {item.icon && React.createElement(item.icon, { className: "w-5 h-5" })}
-                    <span className="font-medium">{item.label}</span>
-                  </button>
-                ))}
-
-                {/* Register Button */}
-                <button
-                  onClick={() => handleNavigation('/register')}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left mt-4 ${
-                    currentView === 'register'
-                      ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white'
-                      : 'bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600'
-                  }`}
-                >
-                  <UserPlus className="w-5 h-5" />
-                  <span className="font-medium">{t('add_member')}</span>
-                </button>
-              </div>
-
-              {/* Contact Info */}
-              <div className="p-6 border-t border-gray-200 mt-4">
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3 text-gray-600">
-                    <Phone className="w-5 h-5 text-green-600" />
-                    <div>
-                      <p className="text-sm font-medium">+251 910 4169 32</p>
-                      <p className="text-xs text-gray-500">{t('phone_numbers')}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3 text-gray-600">
-                    <Mail className="w-5 h-5 text-green-600" />
-                    <div>
-                      <p className="text-sm font-medium">info@salemsaccos.com</p>
-                      <p className="text-xs text-gray-500">{t('email_address')}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </>
       )}
-    </>
-  )
-}
+    </header>
+  );
+};
 
-export default Header
+export default Header;

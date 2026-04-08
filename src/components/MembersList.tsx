@@ -127,16 +127,16 @@ const MembersList: React.FC = () => {
           <title>${t('saccos')} - ${t('members_list_report')}</title>
           <style>
             body { font-family: Arial, sans-serif; margin: 20px; }
-            .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #16a34a; padding-bottom: 20px; }
-            .logo { color: #16a34a; font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+            .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #1e3b8b; padding-bottom: 20px; }
+            .logo { color: #1e3b8b; font-size: 24px; font-weight: bold; margin-bottom: 10px; }
             .subtitle { color: #666; font-size: 14px; }
-            .filters { margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px; }
+            .filters { margin-bottom: 20px; padding: 15px; background: #f8f6f5; border-radius: 8px; }
             .filters h3 { margin: 0 0 10px 0; font-size: 16px; }
             .filter-item { margin: 5px 0; font-size: 14px; }
             table { width: 100%; border-collapse: collapse; margin-top: 20px; }
             th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 12px; }
-            th { background-color: #16a34a; color: white; font-weight: bold; }
-            tr:nth-child(even) { background-color: #f9f9f9; }
+            th { background-color: #1e3b8b; color: white; font-weight: bold; }
+            tr:nth-child(even) { background-color: #f8f6f5; }
             .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #666; border-top: 1px solid #ddd; padding-top: 20px; }
             @media print { body { margin: 0; } }
           </style>
@@ -368,7 +368,7 @@ const MembersList: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     )
   }
@@ -396,7 +396,7 @@ const MembersList: React.FC = () => {
                 placeholder={t('search_placeholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent w-full md:w-80"
+                className="pl-10 pr-4 py-2 border border-secondary-dark rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent w-full md:w-80 outline-none transition-all"
               />
             </div>
           </div>
@@ -413,7 +413,7 @@ const MembersList: React.FC = () => {
               <select
                 value={regionFilter}
                 onChange={(e) => setRegionFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-secondary-dark rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
               >
                 <option value="all">{t('all_regions')}</option>
                 {getUniqueRegions().map((region) => (
@@ -430,7 +430,7 @@ const MembersList: React.FC = () => {
               <select
                 value={searchCategory}
                 onChange={(e) => setSearchCategory(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-secondary-dark rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
               >
                 <option value="all">{t('all')}</option>
                 <option value="name">{t('name')}</option>
@@ -502,7 +502,7 @@ const MembersList: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <button
                       onClick={() => setSelectedMember(member)}
-                      className="flex items-center text-green-600 hover:text-green-700 text-sm font-medium"
+                      className="flex items-center text-primary hover:text-primary-dark text-sm font-medium transition-colors"
                     >
                       <Eye className="w-4 h-4 mr-1" />
                       {t('view_details')}
@@ -548,10 +548,10 @@ const MembersList: React.FC = () => {
                         <button
                           key={page}
                           onClick={() => goToPage(page)}
-                          className={`px-3 py-2 text-sm font-medium rounded-lg ${
+                          className={`px-3 py-2 text-sm font-medium rounded-lg transition-all ${
                             page === currentPage
-                              ? "bg-green-600 text-white"
-                              : "text-gray-700 bg-white border border-gray-300 hover:bg-gray-50"
+                              ? "bg-primary text-white shadow-md"
+                              : "text-gray-700 bg-white border border-gray-300 hover:bg-secondary"
                           }`}
                         >
                           {page}
