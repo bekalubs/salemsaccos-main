@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Upload, X, Check } from 'lucide-react'
 
 interface FileUploadProps {
@@ -9,6 +10,7 @@ interface FileUploadProps {
 }
 
 const FileUpload: React.FC<FileUploadProps> = ({ label, onChange, accept = "image/*", required = false }) => {
+  const { t } = useTranslation()
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
 
@@ -37,7 +39,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ label, onChange, accept = "imag
   return (
     <div className="space-y-2">
       <label className="block text-sm font-medium text-gray-700">
-        {label} {required && <span className="text-red-500">*</span>}
+        {label} {required && <span className="text-primary">*</span>}
       </label>
       
       <div className="relative">
@@ -48,7 +50,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ label, onChange, accept = "imag
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
         />
         
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-gray-400 transition-colors">
+        <div className="border-2 border-dashed border-accent/40 rounded-lg p-4 bg-secondary text-center hover:border-primary-light transition-colors">
           {preview ? (
             <div className="relative">
               <img
@@ -59,7 +61,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ label, onChange, accept = "imag
               <button
                 type="button"
                 onClick={removeFile}
-                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                className="absolute -top-2 -right-2 bg-primary text-white rounded-full p-1 hover:bg-primary-dark transition-colors"
               >
                 <X className="w-3 h-3" />
               </button>
@@ -69,12 +71,12 @@ const FileUpload: React.FC<FileUploadProps> = ({ label, onChange, accept = "imag
               <Upload className="w-8 h-8 mx-auto text-gray-400 mb-2" />
               <p className="text-sm text-gray-500">
                 {file ? (
-                  <span className="flex items-center justify-center gap-1">
-                    <Check className="w-4 h-4 text-green-500" />
+                  <span className="flex items-center justify-center gap-1 text-primary">
+                    <Check className="w-4 h-4" />
                     {file.name}
                   </span>
                 ) : (
-                  "ፋይል ይምረጡ"
+                  t('choose_file')
                 )}
               </p>
             </div>
