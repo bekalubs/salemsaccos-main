@@ -9,7 +9,6 @@ import {
   Compass,
   Target,
   FileDown,
-  ArrowUpRight,
   CheckCircle,
   Star,
   Building,
@@ -67,17 +66,23 @@ const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
             <div className="flex flex-wrap gap-4">
               <button 
                 onClick={() => window.location.href = '/register'}
-                className="bg-primary text-white px-10 py-4 rounded-xl font-bold flex items-center gap-2 hover:bg-primary-dark transition-all shadow-lg shadow-primary/20"
+                className="bg-primary text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 hover:bg-primary-dark transition-all shadow-lg shadow-primary/20"
               >
-                {t('add_member')}
+                {t('register_now')}
                 <ArrowRight size={20} />
               </button>
               <button 
+                onClick={() => window.location.href = '/deposit'}
+                className="px-8 py-4 rounded-xl border-2 border-primary/20 bg-white text-primary font-bold hover:bg-primary/5 flex items-center gap-2 transition-all shadow-lg shadow-gray-200/50"
+              >
+                <CreditCard size={20} className="text-accent" />
+                {t('monthly_deposit')}
+              </button>
+              <button 
                 onClick={onContactClick}
-                className="px-10 py-4 rounded-xl border-2 border-gray-200 font-bold text-gray-700 hover:bg-gray-100 flex items-center gap-2 transition-all"
+                className="px-6 py-4 rounded-xl font-bold text-gray-500 hover:text-primary flex items-center gap-2 transition-all text-sm"
               >
                 {t('contact_us')}
-                <ArrowUpRight size={18} className="text-gray-400" />
               </button>
             </div>
             
@@ -265,12 +270,27 @@ const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
                     <ArrowRight className="text-accent opacity-0 group-hover:opacity-100 transition-all" />
                   </div>
                 ))}
-                <button 
-                  onClick={() => window.location.href = '/register'}
-                  className="w-full bg-accent text-white py-5 rounded-2xl font-black text-lg hover:bg-accent-dark transition-all transform hover:scale-[1.01] mt-4 shadow-xl shadow-accent/20"
-                >
-                  {t('register_now')}
-                </button>
+                <div className="flex flex-col sm:flex-row gap-6 pt-10 animate-slideUp">
+                  <button 
+                    onClick={() => window.location.href = '/register'}
+                    className="group flex items-center justify-center gap-3 bg-accent text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-accent-dark transition-all transform hover:scale-105 shadow-2xl shadow-accent/20"
+                  >
+                    <span>{t('register_now')}</span>
+                    <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center group-hover:translate-x-1 transition-transform">
+                      <ArrowRight size={20} />
+                    </div>
+                  </button>
+
+                  <button 
+                    onClick={() => window.location.href = '/deposit'}
+                    className="group flex items-center justify-center gap-3 bg-white/10 backdrop-blur-md text-white border-2 border-white/20 px-10 py-5 rounded-2xl font-black text-lg hover:bg-white/20 transition-all transform hover:scale-105"
+                  >
+                    <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center">
+                       <CreditCard size={20} className="text-accent" />
+                    </div>
+                    <span>{t('monthly_deposit')}</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>

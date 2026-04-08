@@ -1,7 +1,7 @@
 // components/Header.tsx
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Menu, X, Globe, UserPlus, ChevronDown, Rocket } from 'lucide-react';
+import { Menu, X, Globe, UserPlus, ChevronDown, Rocket, ArrowUpRight } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
@@ -109,7 +109,7 @@ const Header: React.FC<HeaderProps> = ({
                   <button
                     key={lng}
                     onClick={() => handleLanguageChange(lng)}
-                    className="w-full px-4 py-2.5 text-left text-sm font-bold hover:bg-gray-50 text-gray-700 flex justify-between items-center"
+                    className="w-full flex items-center justify-between p-4 rounded-2xl bg-gray-50 text-gray-900 text-sm font-bold active:bg-gray-100 transition-colors"
                   >
                     <span>{lng === 'en' ? 'English' : 'አማርኛ'}</span>
                     {i18n.language === lng && <div className="w-1.5 h-1.5 rounded-full bg-accent"></div>}
@@ -177,9 +177,10 @@ const Header: React.FC<HeaderProps> = ({
                         handleScrollToSection?.(item.id);
                         setIsMobileMenuOpen(false);
                       }}
-                      className="text-3xl font-black text-gray-800 text-left hover:text-primary active:scale-95 transition-all py-2 border-b border-gray-50 last:border-0"
+                      className="text-2xl font-bold text-gray-800 text-left hover:text-primary active:scale-95 transition-all py-3 border-b border-gray-50 flex items-center justify-between group last:border-0"
                     >
-                      {item.label}
+                      <span>{item.label}</span>
+                      <ArrowUpRight className="text-gray-300 group-hover:text-primary transition-colors" size={24} />
                     </button>
                   ))}
                 </>

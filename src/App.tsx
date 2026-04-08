@@ -7,6 +7,7 @@ import RegistrationForm from './components/RegistrationForm'
 import MembersList from './components/MembersList'
 import LandingPage from './components/LandingPage'
 import ContactModal from './components/ContactModal'
+import MonthlyDeposit from './components/MonthlyDeposit'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import MobileMenuBackdrop from './components/MobileMenuBackdrop'
@@ -15,19 +16,12 @@ import i18n from './i18n'
 function AppContent() {
   // const { t, i18n: i18nInstance } = useTranslation()
   const location = useLocation()
-  const [currentView, setCurrentView] = useState<'home' | 'register' | 'members'>('home')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
 
-  // Update currentView based on current route
+  // Update current route
   React.useEffect(() => {
-    if (location.pathname === '/') {
-      setCurrentView('home')
-    } else if (location.pathname === '/register') {
-      setCurrentView('register')
-    } else if (location.pathname === '/members') {
-      setCurrentView('members')
-    }
+    // Logic for route-specific side effects if needed
   }, [location.pathname])
 
   const scrollToSection = (sectionId: string) => {
@@ -71,6 +65,7 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<LandingPage onContactClick={() => setIsContactModalOpen(true)} />} />
           <Route path="/register" element={<RegistrationForm />} />
+          <Route path="/deposit" element={<MonthlyDeposit />} />
           <Route path="/members" element={<MembersList />} />
           {/* Redirect unknown routes to home */}
           <Route path="*" element={<Navigate to="/" />} />
@@ -84,7 +79,7 @@ function AppContent() {
       />
 
       {/* Footer Component */}
-      <Footer currentView={currentView} />
+      <Footer />
     </>
   )
 }
