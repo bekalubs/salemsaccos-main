@@ -990,9 +990,9 @@ const RegisterMember: React.FC = () => {
                   
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
                     {[
-                      { id: 'basic', label: t('basic_share'), amount: 1000, desc: t('basic_share_desc'), color: '#3b82f6' },
-                      { id: 'regular', label: t('regular_share'), amount: 5000, desc: t('regular_share_desc'), color: '#10b981' },
-                      { id: 'special', label: t('special_share'), amount: 10000, desc: t('special_share_desc'), color: BRAND.accent }
+                      // { id: 'basic', label: t('basic_share'), amount: 1000, desc: t('basic_share_desc'), color: '#3b82f6' },
+                      // { id: 'regular', label: t('regular_share'), amount: 5000, desc: t('regular_share_desc'), color: '#10b981' },
+                      // { id: 'special', label: t('special_share'), amount: 10000, desc: t('special_share_desc'), color: BRAND.accent }
                     ].map((plan) => (
                       <div
                         key={plan.id}
