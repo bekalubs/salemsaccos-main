@@ -32,6 +32,8 @@ const RegistrationSummary: React.FC = () => {
     accentDark: '#d4962a'
   };
 
+  const API_BASE_URL = 'http://142.132.180.209:4583';
+
   useEffect(() => {
     const fetchMember = async () => {
       try {
@@ -48,6 +50,12 @@ const RegistrationSummary: React.FC = () => {
 
     fetchMember();
   }, [id]);
+
+  const getFullImageUrl = (path: string) => {
+    if (!path) return '';
+    if (path.startsWith('http')) return path;
+    return `${API_BASE_URL}${path.startsWith('/') ? '' : '/'}${path}`;
+  };
 
   if (loading) {
     return (
@@ -133,7 +141,7 @@ const RegistrationSummary: React.FC = () => {
             <div className="bg-white rounded-3xl shadow-xl overflow-hidden mb-8 border border-slate-100">
               <div className="aspect-square bg-slate-100 relative">
                 {member.profilePhotoUrl ? (
-                  <img src={member.profilePhotoUrl} alt="Profile" className="w-full h-full object-cover" />
+                  <img src={getFullImageUrl(member.profilePhotoUrl)} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-slate-300">
                     <User size={120} />
@@ -221,10 +229,10 @@ const RegistrationSummary: React.FC = () => {
                 ].map((doc, i) => (
                   doc.url ? (
                     <div key={i} className="group relative aspect-[3/4] rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
-                      <img src={doc.url} alt={doc.label} className="w-full h-full object-cover" />
+                      <img src={getFullImageUrl(doc.url)} alt={doc.label} className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-2 text-center">
                         <p className="text-white text-[10px] font-bold uppercase">{doc.label}</p>
-                        <a href={doc.url} target="_blank" rel="noreferrer" className="mt-2 px-3 py-1 bg-white text-black rounded text-[10px] font-bold">VIEW</a>
+                        <a href={getFullImageUrl(doc.url)} target="_blank" rel="noreferrer" className="mt-2 px-3 py-1 bg-white text-black rounded text-[10px] font-bold">VIEW</a>
                       </div>
                     </div>
                   ) : (
