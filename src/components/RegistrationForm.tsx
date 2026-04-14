@@ -184,10 +184,12 @@ const RegisterMember: React.FC = () => {
       const res = await membersAPI.uploadFile(uploadData, typeMap[name]);
       
       if (res.data) {
-        // Handle response which could be the filename string or a full object
+        // Handle response which could be the filename string, a relative path, or a full object
         let fileUrl = res.data.url || res.data.filename || res.data;
-        if (typeof fileUrl === 'string' && !fileUrl.startsWith('http')) {
-          fileUrl = membersAPI.getFileUrl(typeMap[name], fileUrl);
+        
+        // If it's just a filename (doesn't contain slashes), construct the relative path
+        if (typeof fileUrl === 'string' && !fileUrl.includes('/')) {
+          fileUrl = `/api/v1/members/files/${typeMap[name]}/${fileUrl}`;
         }
         
         setDocumentUrls(prev => ({ ...prev, [urlMap[name]]: fileUrl }));
@@ -294,7 +296,7 @@ const RegisterMember: React.FC = () => {
       let finalAccountNumber = personalInfo.accountNumber;
       if (!finalAccountNumber) {
         const randomPart = Math.floor(10000000 + Math.random() * 90000000).toString();
-        finalAccountNumber = `SAL-${randomPart}`;
+        finalAccountNumber = `1000${randomPart}`; // Match curl example 13 digits
       }
 
       const payload = {
@@ -327,7 +329,7 @@ const RegisterMember: React.FC = () => {
         membershipDate: new Date().toISOString(),
         status: personalInfo.status || 'ACTIVE',
         isOrganizational: personalInfo.isOrganizational,
-        orgManagerName: personalInfo.orgManagerName,
+        orgManagerName: personalInfo.orgManagerName || null,
         tinNumber: personalInfo.tinNumber,
         educationEmploymentInfo: {
           employmentStatus: educationEmploymentInfo.employmentStatus,
@@ -338,6 +340,11 @@ const RegisterMember: React.FC = () => {
           currentPosition: educationEmploymentInfo.currentPosition,
           previousPosition: educationEmploymentInfo.previousPosition,
           directorshipInfo: educationEmploymentInfo.directorshipInfo
+        },
+        approvalInfo: {
+          approved: false,
+          approvedBy: '',
+          approvedDate: new Date().toISOString()
         },
         documents: {
           nationalIdFrontUrl: documentUrls.nationalIdFrontUrl,
@@ -354,7 +361,7 @@ const RegisterMember: React.FC = () => {
           destinationBankOurAccount: paymentInfo.destinationBankOurAccount
         },
         motherName: personalInfo.motherName,
-        familySize: personalInfo.familySize,
+        familySize: Number(personalInfo.familySize),
         emergencyContact: {
           fullName: emergencyContact.fullName,
           phone: emergencyContact.phone,
