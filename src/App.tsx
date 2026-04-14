@@ -11,6 +11,7 @@ import MonthlyDeposit from './components/MonthlyDeposit'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import MobileMenuBackdrop from './components/MobileMenuBackdrop'
+import RegistrationSummary from './components/RegistrationSummary'
 import i18n from './i18n'
 
 function AppContent() {
@@ -67,6 +68,7 @@ function AppContent() {
           <Route path="/register" element={<RegistrationForm />} />
           <Route path="/deposit" element={<MonthlyDeposit />} />
           <Route path="/members" element={<MembersList />} />
+          <Route path="/registration-success/:id" element={<RegistrationSummary />} />
           {/* Redirect unknown routes to home */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
