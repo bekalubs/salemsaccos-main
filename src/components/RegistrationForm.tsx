@@ -51,15 +51,31 @@ const RegisterMember: React.FC = () => {
     isOrganizational: false,
     orgManagerName: '',
     tinNumber: '',
+    motherName: '',
+    familySize: 1,
+    profilePhotoUrl: '',
+    isDeleted: false,
   });
 
-  const [shareInfo, setShareInfo] = useState({
-    shareType: 'basic',
-    shareAmount: 1000,
+  const [emergencyContact, setEmergencyContact] = useState({
+    fullName: '',
+    phone: '',
+    relationship: ''
+  });
+
+  const [referralInfo, setReferralInfo] = useState({
+    referralSource: '',
+    referredByName: '',
+    referredByPhone: ''
+  });
+
+  const [paymentInfo, setPaymentInfo] = useState({
     registrationFee: 1500,
-    monthlySaving: 500,
-    originBank: '',
-    destinationBank: ''
+    shareAmount: 1000,
+    initialShares: 1,
+    initialMonthlySaving: 500,
+    originBankSentFrom: '',
+    destinationBankOurAccount: 1000753677503 // CBE Default
   });
   
   const [contactInfo, setContactInfo] = useState({
@@ -80,6 +96,8 @@ const RegisterMember: React.FC = () => {
   });
   
   const [educationEmploymentInfo, setEducationEmploymentInfo] = useState({
+    employmentStatus: 'GOVERNMENT',
+    employerName: '',
     educationLevel: '',
     areaOfStudy: '',
     otherQualifications: '',
@@ -87,6 +105,94 @@ const RegisterMember: React.FC = () => {
     previousPosition: '',
     directorshipInfo: ''
   });
+
+  const [documents, setDocuments] = useState({
+    idFront: '',
+    idBack: '',
+    signature: '',
+    receipt: '',
+    profilePhoto: ''
+  });
+
+  const [documentUrls, setDocumentUrls] = useState({
+    nationalIdFrontUrl: '',
+    nationalIdBackUrl: '',
+    digitalSignatureUrl: '',
+    registrationFeeReceiptUrl: '',
+    profilePhotoUrl: ''
+  });
+
+  const [uploadingFiles, setUploadingFiles] = useState<{ [key: string]: boolean }>({});
+  const [pendingFiles, setPendingFiles] = useState<{ [key: string]: File | string | null }>({});
+
+  const dataURLtoBlob = (dataurl: string) => {
+    const arr = dataurl.split(',');
+    const mimeMatch = arr[0].match(/:(.*?);/);
+    if (!mimeMatch) return null;
+    const mime = mimeMatch[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], { type: mime });
+  };
+
+  const handleFileChange = (name: string, file: File | null) => {
+    setPendingFiles(prev => ({ ...prev, [name]: file }));
+    // Clear any previous URL if a new file is picked
+    if (file) {
+      const urlMap: { [key: string]: string } = {
+        idFront: 'nationalIdFrontUrl',
+        idBack: 'nationalIdBackUrl',
+        signature: 'digitalSignatureUrl',
+        receipt: 'registrationFeeReceiptUrl'
+      };
+      setDocumentUrls(prev => ({ ...prev, [urlMap[name]]: '' }));
+    }
+  };
+
+  const executeUpload = async (name: string) => {
+    const file = pendingFiles[name];
+    if (!file) return;
+
+    setUploadingFiles(prev => ({ ...prev, [name]: true }));
+    try {
+      const typeMap: { [key: string]: string } = {
+        idFront: 'NATIONAL_ID_FRONT',
+        idBack: 'NATIONAL_ID_BACK',
+        signature: 'SIGNATURE',
+        receipt: 'RECEIPT'
+      };
+
+      const urlMap: { [key: string]: string } = {
+        idFront: 'nationalIdFrontUrl',
+        idBack: 'nationalIdBackUrl',
+        signature: 'digitalSignatureUrl',
+        receipt: 'registrationFeeReceiptUrl',
+        profilePhoto: 'profilePhotoUrl'
+      };
+
+      let uploadData: any = file;
+      if ((name === 'signature' || name === 'profilePhoto') && typeof file === 'string') {
+        uploadData = dataURLtoBlob(file);
+      }
+
+      const userId = getCurrentUserId();
+      const res = await membersAPI.uploadFile(uploadData, userId, typeMap[name]);
+      
+      if (res.data) {
+        setDocumentUrls(prev => ({ ...prev, [urlMap[name]]: res.data }));
+        setPendingFiles(prev => ({ ...prev, [name]: null }));
+      }
+    } catch (err) {
+      console.error(`Error uploading ${name}:`, err);
+      setError(`${t('registration_error')}: Failed to upload ${name}`);
+    } finally {
+      setUploadingFiles(prev => ({ ...prev, [name]: false }));
+    }
+  };
 
   const tabs = [
     { id: 'personal', label: t('personal_info_tab'), icon: User },
@@ -129,6 +235,16 @@ const RegisterMember: React.FC = () => {
     setEducationEmploymentInfo(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleEmergencyChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setEmergencyContact(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleReferralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setReferralInfo(prev => ({ ...prev, [name]: value }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -145,7 +261,7 @@ const RegisterMember: React.FC = () => {
         return;
       }
     } else if (activeTab === 'payment') {
-      if (!shareInfo.shareType) {
+      if (!paymentInfo.initialShares) {
         setError(t('registration_error_detail'));
         return;
       }
@@ -175,32 +291,94 @@ const RegisterMember: React.FC = () => {
       }
 
       const payload = {
-        ...personalInfo,
+        title: personalInfo.title || "Mr",
+        firstName: personalInfo.firstName,
+        middleName: personalInfo.middleName,
+        lastName: personalInfo.lastName,
+        fullNameAmharic: personalInfo.fullNameAmharic,
+        gender: personalInfo.gender,
+        dateOfBirth: personalInfo.dateOfBirth, // Should be YYYY-MM-DD
+        maritalStatus: personalInfo.maritalStatus,
+        nationality: personalInfo.nationality,
+        nationalId: personalInfo.nationalId,
+        contactInfo: {
+          mobileNumber: contactInfo.mobileNumber,
+          mobileNumber2: contactInfo.mobileNumber2,
+          officePhone: contactInfo.officePhone,
+          email: contactInfo.email
+        },
+        addressInfo: {
+          branchCode: addressInfo.branchCode,
+          country: addressInfo.country,
+          region: addressInfo.region,
+          city: addressInfo.city,
+          subCity: addressInfo.subCity,
+          woreda: addressInfo.woreda,
+          houseNumber: addressInfo.houseNumber
+        },
         accountNumber: finalAccountNumber,
-        registrationFee: shareInfo.registrationFee,
-        shareAmount: shareInfo.shareAmount,
-        initialMonthlySaving: shareInfo.monthlySaving,
-        totalInitialPayment: shareInfo.registrationFee + shareInfo.shareAmount + shareInfo.monthlySaving,
-        originBank: shareInfo.originBank,
-        destinationBank: shareInfo.destinationBank,
         membershipDate: new Date().toISOString(),
-        contactInfo,
-        addressInfo,
-        educationEmploymentInfo,
-        createdBy
+        status: personalInfo.status || 'ACTIVE',
+        isOrganizational: personalInfo.isOrganizational,
+        orgManagerName: personalInfo.orgManagerName,
+        tinNumber: personalInfo.tinNumber,
+        educationEmploymentInfo: {
+          employmentStatus: educationEmploymentInfo.employmentStatus,
+          employerName: educationEmploymentInfo.employerName,
+          educationLevel: educationEmploymentInfo.educationLevel,
+          areaOfStudy: educationEmploymentInfo.areaOfStudy,
+          otherQualifications: educationEmploymentInfo.otherQualifications,
+          currentPosition: educationEmploymentInfo.currentPosition,
+          previousPosition: educationEmploymentInfo.previousPosition,
+          directorshipInfo: educationEmploymentInfo.directorshipInfo
+        },
+        documents: {
+          nationalIdFrontUrl: documentUrls.nationalIdFrontUrl,
+          nationalIdBackUrl: documentUrls.nationalIdBackUrl,
+          digitalSignatureUrl: documentUrls.digitalSignatureUrl,
+          registrationFeeReceiptUrl: documentUrls.registrationFeeReceiptUrl
+        },
+        payment: {
+          registrationFee: paymentInfo.registrationFee,
+          shareAmount: paymentInfo.shareAmount,
+          initialShares: paymentInfo.initialShares,
+          initialMonthlySaving: paymentInfo.initialMonthlySaving,
+          originBankSentFrom: paymentInfo.originBankSentFrom,
+          destinationBankOurAccount: paymentInfo.destinationBankOurAccount
+        },
+        motherName: personalInfo.motherName,
+        familySize: personalInfo.familySize,
+        emergencyContact: {
+          fullName: emergencyContact.fullName,
+          phone: emergencyContact.phone,
+          relationship: emergencyContact.relationship
+        },
+        referralSource: referralInfo.referralSource,
+        referredByName: referralInfo.referredByName,
+        referredByPhone: referralInfo.referredByPhone,
+        profilePhotoUrl: documentUrls.profilePhotoUrl,
+        isDeleted: false
       };
       
+      console.log('Final Registration Payload:', payload);
       const res = await membersAPI.create(payload, addressInfo.branchCode);
-      if (res.data) {
+      if (res.data && res.data.success !== false) {
+        // Find the member ID from the response
+        const memberData = res.data.data || res.data;
+        const memberId = memberData.id;
+        
         setSuccess(true);
         setTimeout(() => {
           setSuccess(false);
-          navigate('/'); // In this project, '/' is the home view
-        }, 1800);
+          navigate(`/registration-success/${memberId}`);
+        }, 1500);
+      } else {
+        setError(res.data?.message || t('registration_error'));
       }
     } catch (err) {
-      console.error(err);
-      setError(t('registration_error'));
+      console.error('Registration error:', err);
+      const backendMessage = err.response?.data?.message;
+      setError(backendMessage || t('registration_error'));
     } finally {
       setLoading(false);
     }
@@ -675,6 +853,32 @@ const RegisterMember: React.FC = () => {
                     />
                   </div>
                   <div style={styles.fieldGroup}>
+                    <label style={styles.label}>{t('mother_name_label')}</label>
+                    <input
+                      type="text"
+                      name="motherName"
+                      value={personalInfo.motherName}
+                      onChange={handlePersonalChange}
+                      placeholder={t('mother_name_placeholder')}
+                      style={styles.input}
+                      onFocus={(e) => e.currentTarget.style.borderColor = BRAND.primary}
+                      onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
+                    />
+                  </div>
+                  <div style={styles.fieldGroup}>
+                    <label style={styles.label}>{t('family_size_label')}</label>
+                    <input
+                      type="number"
+                      name="familySize"
+                      value={personalInfo.familySize}
+                      onChange={handlePersonalChange}
+                      min="1"
+                      style={styles.input}
+                      onFocus={(e) => e.currentTarget.style.borderColor = BRAND.primary}
+                      onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
+                    />
+                  </div>
+                  <div style={styles.fieldGroup}>
                     <label style={styles.label}>{t('account_number_label')}</label>
                     <input
                       type="text"
@@ -686,6 +890,48 @@ const RegisterMember: React.FC = () => {
                       onFocus={(e) => e.currentTarget.style.borderColor = BRAND.primary}
                       onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
                     />
+                  </div>
+                </div>
+
+                <div style={{ marginTop: '32px', padding: '24px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <h3 style={{ ...styles.label, fontSize: '16px', marginBottom: '20px', color: BRAND.primary }}>
+                    <Users size={18} style={{ marginRight: '8px' }} />
+                    {t('emergency_contact_title')}
+                  </h3>
+                  <div style={styles.grid}>
+                    <div style={styles.fieldGroup}>
+                      <label style={styles.label}>{t('emergency_contact_full_name')}</label>
+                      <input
+                        type="text"
+                        name="fullName"
+                        value={emergencyContact.fullName}
+                        onChange={handleEmergencyChange}
+                        placeholder={t('first_name_placeholder')}
+                        style={styles.input}
+                      />
+                    </div>
+                    <div style={styles.fieldGroup}>
+                      <label style={styles.label}>{t('mobile_number_label')}</label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={emergencyContact.phone}
+                        onChange={handleEmergencyChange}
+                        placeholder={t('mobile_number_placeholder')}
+                        style={styles.input}
+                      />
+                    </div>
+                    <div style={styles.fieldGroup}>
+                      <label style={styles.label}>{t('relationship_label')}</label>
+                      <input
+                        type="text"
+                        name="relationship"
+                        value={emergencyContact.relationship}
+                        onChange={handleEmergencyChange}
+                        placeholder={t('relationship_placeholder')}
+                        style={styles.input}
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -791,6 +1037,48 @@ const RegisterMember: React.FC = () => {
                     />
                   </div>
                 </div>
+
+                <div style={{ marginTop: '32px', padding: '24px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <h3 style={{ ...styles.label, fontSize: '16px', marginBottom: '20px', color: BRAND.primary }}>
+                    <Users size={18} style={{ marginRight: '8px' }} />
+                    {t('referral_source_label')}
+                  </h3>
+                  <div style={styles.grid}>
+                    <div style={styles.fieldGroup}>
+                      <label style={styles.label}>{t('referral_source_label')}</label>
+                      <input
+                        type="text"
+                        name="referralSource"
+                        value={referralInfo.referralSource}
+                        onChange={handleReferralChange}
+                        placeholder="e.g., Friend, Online, Branch"
+                        style={styles.input}
+                      />
+                    </div>
+                    <div style={styles.fieldGroup}>
+                      <label style={styles.label}>{t('referred_by_name_label')}</label>
+                      <input
+                        type="text"
+                        name="referredByName"
+                        value={referralInfo.referredByName}
+                        onChange={handleReferralChange}
+                        placeholder={t('first_name_placeholder')}
+                        style={styles.input}
+                      />
+                    </div>
+                    <div style={styles.fieldGroup}>
+                      <label style={styles.label}>{t('referred_by_phone_label')}</label>
+                      <input
+                        type="tel"
+                        name="referredByPhone"
+                        value={referralInfo.referredByPhone}
+                        onChange={handleReferralChange}
+                        placeholder={t('mobile_number_placeholder')}
+                        style={styles.input}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -883,6 +1171,31 @@ const RegisterMember: React.FC = () => {
               <div className="animate-fadeIn">
                 <div style={styles.grid}>
                   <div style={styles.fieldGroup}>
+                    <label style={styles.label}>{t('employment_status_label')}</label>
+                    <select
+                      name="employmentStatus"
+                      value={educationEmploymentInfo.employmentStatus}
+                      onChange={handleEducationChange}
+                      style={styles.select}
+                    >
+                      <option value="GOVERNMENT">{t('employment_gov')}</option>
+                      <option value="PRIVATE">{t('employment_private')}</option>
+                      <option value="SELF_EMPLOYED">{t('employment_self')}</option>
+                      <option value="STUDENT">{t('employment_student')}</option>
+                    </select>
+                  </div>
+                  <div style={styles.fieldGroup}>
+                    <label style={styles.label}>{t('employer_name_label')}</label>
+                    <input
+                      type="text"
+                      name="employerName"
+                      value={educationEmploymentInfo.employerName}
+                      onChange={handleEducationChange}
+                      placeholder={t('employer_name_placeholder')}
+                      style={styles.input}
+                    />
+                  </div>
+                  <div style={styles.fieldGroup}>
                     <label style={styles.label}>
                       <GraduationCap size={14} color={BRAND.primary} />
                       {t('education_level_label')}
@@ -953,14 +1266,63 @@ const RegisterMember: React.FC = () => {
                     {t('documents_title')}
                   </h3>
                   <div style={{ ...styles.grid, marginTop: '16px' }}>
-                    <FileUpload
-                      label={t('id_front_label')}
-                      onChange={() => {}} // "Just nothing happens okay for now"
-                    />
-                    <FileUpload
-                      label={t('id_back_label')}
-                      onChange={() => {}} // "Just nothing happens okay for now"
-                    />
+                    <div style={styles.fieldGroup}>
+                      <FileUpload
+                        label={t('id_front_label')}
+                        onChange={(file) => handleFileChange('idFront', file)}
+                      />
+                      {pendingFiles.idFront && !uploadingFiles.idFront && (
+                        <button 
+                          type="button"
+                          onClick={() => executeUpload('idFront')}
+                          style={{ ...styles.submitButton, marginTop: '8px', padding: '8px 16px', fontSize: '12px' }}
+                        >
+                          {t('verify_and_upload')}
+                        </button>
+                      )}
+                      {uploadingFiles.idFront && <p style={{ fontSize: '11px', color: BRAND.primary }}>{t('processing')}</p>}
+                      {documentUrls.nationalIdFrontUrl && !uploadingFiles.idFront && (
+                        <p style={{ fontSize: '11px', color: '#10b981', marginTop: '4px' }}>✓ {t('uploaded_successfully')}</p>
+                      )}
+                    </div>
+                    <div style={styles.fieldGroup}>
+                      <FileUpload
+                        label={t('id_back_label')}
+                        onChange={(file) => handleFileChange('idBack', file)}
+                      />
+                      {pendingFiles.idBack && !uploadingFiles.idBack && (
+                        <button 
+                          type="button"
+                          onClick={() => executeUpload('idBack')}
+                          style={{ ...styles.submitButton, marginTop: '8px', padding: '8px 16px', fontSize: '12px' }}
+                        >
+                          {t('verify_and_upload')}
+                        </button>
+                      )}
+                      {uploadingFiles.idBack && <p style={{ fontSize: '11px', color: BRAND.primary }}>{t('processing')}</p>}
+                      {documentUrls.nationalIdBackUrl && !uploadingFiles.idBack && (
+                        <p style={{ fontSize: '11px', color: '#10b981', marginTop: '4px' }}>✓ {t('uploaded_successfully')}</p>
+                      )}
+                    </div>
+                    <div style={styles.fieldGroup}>
+                      <FileUpload
+                        label={t('profile_photo_label')}
+                        onChange={(file) => handleFileChange('profilePhoto', file)}
+                      />
+                      {pendingFiles.profilePhoto && !uploadingFiles.profilePhoto && (
+                        <button 
+                          type="button"
+                          onClick={() => executeUpload('profilePhoto')}
+                          style={{ ...styles.submitButton, marginTop: '8px', padding: '8px 16px', fontSize: '12px' }}
+                        >
+                          {t('verify_and_upload')}
+                        </button>
+                      )}
+                      {uploadingFiles.profilePhoto && <p style={{ fontSize: '11px', color: BRAND.primary }}>{t('processing')}</p>}
+                      {documentUrls.profilePhotoUrl && !uploadingFiles.profilePhoto && (
+                        <p style={{ fontSize: '11px', color: '#10b981', marginTop: '4px' }}>✓ {t('uploaded_successfully')}</p>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -971,9 +1333,26 @@ const RegisterMember: React.FC = () => {
                   </h3>
                   <div style={{ marginTop: '16px' }}>
                     <DigitalSignature
-                      onSignatureChange={() => {}} // "Just nothing happens okay for now"
-                      value=""
+                      onSignatureChange={(sig) => {
+                        setPendingFiles(prev => ({ ...prev, signature: sig }));
+                        setDocuments(prev => ({ ...prev, signature: sig }));
+                        setDocumentUrls(prev => ({ ...prev, digitalSignatureUrl: '' }));
+                      }}
+                      value={documents.signature}
                     />
+                    {pendingFiles.signature && !uploadingFiles.signature && (
+                      <button 
+                        type="button"
+                        onClick={() => executeUpload('signature')}
+                        style={{ ...styles.submitButton, marginTop: '12px', padding: '10px 20px', fontSize: '13px' }}
+                      >
+                        {t('confirm_signature_upload')}
+                      </button>
+                    )}
+                    {uploadingFiles.signature && <p style={{ fontSize: '12px', color: BRAND.primary, marginTop: '10px' }}>{t('processing')}</p>}
+                    {documentUrls.digitalSignatureUrl && !uploadingFiles.signature && (
+                      <p style={{ fontSize: '12px', color: '#10b981', marginTop: '10px' }}>✓ {t('signature_saved')}</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -996,19 +1375,19 @@ const RegisterMember: React.FC = () => {
                     ].map((plan) => (
                       <div
                         key={plan.id}
-                        onClick={() => setShareInfo({ ...shareInfo, shareType: plan.id, shareAmount: Math.max(plan.amount, shareInfo.shareAmount) })}
+                        onClick={() => setPaymentInfo({ ...paymentInfo, shareAmount: plan.amount, initialShares: plan.shares })}
                         style={{
                           padding: '24px',
                           borderRadius: '16px',
-                          border: `2px solid ${shareInfo.shareType === plan.id ? BRAND.primary : '#e5e7eb'}`,
-                          background: shareInfo.shareType === plan.id ? `${BRAND.primary}05` : 'white',
+                          border: `2px solid ${paymentInfo.initialShares === plan.shares ? BRAND.primary : '#e5e7eb'}`,
+                          background: paymentInfo.initialShares === plan.shares ? `${BRAND.primary}05` : 'white',
                           cursor: 'pointer',
                           transition: 'all 0.3s ease',
                           position: 'relative',
-                          boxShadow: shareInfo.shareType === plan.id ? '0 10px 15px -3px rgba(30, 59, 139, 0.1)' : 'none'
+                          boxShadow: paymentInfo.initialShares === plan.shares ? '0 10px 15px -3px rgba(30, 59, 139, 0.1)' : 'none'
                         }}
                       >
-                        {shareInfo.shareType === plan.id && (
+                        {paymentInfo.initialShares === plan.shares && (
                           <div style={{ position: 'absolute', top: '12px', right: '12px', background: BRAND.primary, borderRadius: '50%', padding: '4px' }}>
                             <Check size={16} color="white" />
                           </div>
@@ -1039,8 +1418,11 @@ const RegisterMember: React.FC = () => {
                     <input
                       type="number"
                       min="1000"
-                      value={shareInfo.shareAmount}
-                      onChange={(e) => setShareInfo({ ...shareInfo, shareAmount: parseInt(e.target.value) || 0 })}
+                      value={paymentInfo.shareAmount}
+                      onChange={(e) => {
+                        const amt = parseInt(e.target.value) || 0;
+                        setPaymentInfo({ ...paymentInfo, shareAmount: amt, initialShares: Math.floor(amt / 1000) });
+                      }}
                       style={styles.input}
                     />
                   </div>
@@ -1049,8 +1431,8 @@ const RegisterMember: React.FC = () => {
                     <input
                       type="number"
                       min="500"
-                      value={shareInfo.monthlySaving}
-                      onChange={(e) => setShareInfo({ ...shareInfo, monthlySaving: parseInt(e.target.value) || 0 })}
+                      value={paymentInfo.initialMonthlySaving}
+                      onChange={(e) => setPaymentInfo({ ...paymentInfo, initialMonthlySaving: parseInt(e.target.value) || 0 })}
                       style={styles.input}
                     />
                   </div>
@@ -1064,26 +1446,26 @@ const RegisterMember: React.FC = () => {
                     </div>
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontSize: '42px', fontWeight: 900, color: BRAND.accent }}>
-                        {(1500 + shareInfo.shareAmount + shareInfo.monthlySaving).toLocaleString()} <span style={{ fontSize: '20px' }}>Birr</span>
+                        {(1500 + paymentInfo.shareAmount + paymentInfo.initialMonthlySaving).toLocaleString()} <span style={{ fontSize: '20px' }}>Birr</span>
                       </div>
                     </div>
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
                     {[
-                      { name: t('cbe_bank'), number: '1000753677503', logo: 'https://psssa.gov.et/sites/default/files/partner/cbe-logo.png' },
-                      { name: t('abyssinia_bank'), number: '253126493', logo: 'https://upload.wikimedia.org/wikipedia/en/e/ed/Bank_of_Abyssinia.png' }, // Abyssinia logo
-                      { name: t('awash_bank'), number: '013221745348900', logo: 'https://www.exchangebirr.com/bank4.png' },
-                      { name: t('non_interest_option'), number: '1000731916814', logo: 'https://psssa.gov.et/sites/default/files/partner/cbe-logo.png', isMuslim: true }
+                      { name: t('cbe_bank'), number: 1000753677503, logo: 'https://psssa.gov.et/sites/default/files/partner/cbe-logo.png' },
+                      { name: t('abyssinia_bank'), number: 253126493, logo: 'https://upload.wikimedia.org/wikipedia/en/e/ed/Bank_of_Abyssinia.png' },
+                      { name: t('awash_bank'), number: 13221745348900, logo: 'https://www.exchangebirr.com/bank4.png' },
+                      { name: t('non_interest_option'), number: 1000731916814, logo: 'https://psssa.gov.et/sites/default/files/partner/cbe-logo.png', isMuslim: true }
                     ].map((bank, i) => (
                       <div 
                         key={i} 
-                        onClick={() => setShareInfo({ ...shareInfo, destinationBank: `${bank.name} (${bank.number})` })}
+                        onClick={() => setPaymentInfo({ ...paymentInfo, destinationBankOurAccount: bank.number })}
                         style={{ 
-                          background: shareInfo.destinationBank.includes(bank.number) ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)', 
+                          background: paymentInfo.destinationBankOurAccount === bank.number ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)', 
                           padding: '16px', 
                           borderRadius: '12px', 
-                          border: `2px solid ${shareInfo.destinationBank.includes(bank.number) ? BRAND.accent : 'rgba(255,255,255,0.1)'}`, 
+                          border: `2px solid ${paymentInfo.destinationBankOurAccount === bank.number ? BRAND.accent : 'rgba(255,255,255,0.1)'}`, 
                           display: 'flex', 
                           alignItems: 'center', 
                           gap: '12px',
@@ -1106,8 +1488,8 @@ const RegisterMember: React.FC = () => {
                     <label style={styles.label}>{t('origin_bank')}</label>
                     <select 
                       style={styles.select}
-                      value={shareInfo.originBank}
-                      onChange={(e) => setShareInfo({ ...shareInfo, originBank: e.target.value })}
+                      value={paymentInfo.originBankSentFrom}
+                      onChange={(e) => setPaymentInfo({ ...paymentInfo, originBankSentFrom: e.target.value })}
                     >
                       <option value="">{t('placeholder_origin_bank')}</option>
                       <option value="CBE">Commercial Bank of Ethiopia (CBE)</option>
@@ -1125,7 +1507,7 @@ const RegisterMember: React.FC = () => {
                     <label style={styles.label}>{t('destination_bank')}</label>
                     <input
                       type="text"
-                      value={shareInfo.destinationBank}
+                      value={paymentInfo.destinationBankOurAccount || ''}
                       placeholder={t('placeholder_destination_bank')}
                       style={{ ...styles.input, background: '#f1f5f9' }}
                       readOnly
@@ -1141,8 +1523,22 @@ const RegisterMember: React.FC = () => {
                   <div style={{ marginTop: '16px' }}>
                     <FileUpload
                       label={t('upload_receipt')}
-                      onChange={() => {}} // Still on backup nothing but UI exists
+                      accept="image/*,.pdf"
+                      onChange={(file) => handleFileChange('receipt', file)}
                     />
+                    {pendingFiles.receipt && !uploadingFiles.receipt && (
+                      <button 
+                        type="button"
+                        onClick={() => executeUpload('receipt')}
+                        style={{ ...styles.submitButton, marginTop: '8px', padding: '10px 20px', fontSize: '13px' }}
+                      >
+                        {t('confirm_receipt_upload')}
+                      </button>
+                    )}
+                    {uploadingFiles.receipt && <p style={{ fontSize: '11px', color: BRAND.primary, marginTop: '8px' }}>{t('processing')}</p>}
+                    {documentUrls.registrationFeeReceiptUrl && !uploadingFiles.receipt && (
+                      <p style={{ fontSize: '11px', color: '#10b981', marginTop: '8px' }}>✓ {t('receipt_uploaded')}</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1195,13 +1591,13 @@ const RegisterMember: React.FC = () => {
               <button
                 key="submit-btn"
                 type="submit"
-                disabled={loading}
+                disabled={loading || Object.values(uploadingFiles).some(v => v)}
                 style={{
                   ...styles.submitButton,
-                  ...(loading ? styles.submitButtonDisabled : {})
+                  ...((loading || Object.values(uploadingFiles).some(v => v)) ? styles.submitButtonDisabled : {})
                 }}
                 onMouseEnter={(e) => {
-                  if (!loading) {
+                  if (!loading && !Object.values(uploadingFiles).some(v => v)) {
                     e.currentTarget.style.transform = 'translateY(-2px)';
                     e.currentTarget.style.background = BRAND.primaryDark;
                     e.currentTarget.style.boxShadow = '0 6px 12px rgba(30, 59, 139, 0.4)';
@@ -1209,7 +1605,7 @@ const RegisterMember: React.FC = () => {
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.background = BRAND.primary;
+                  e.currentTarget.style.background = (loading || Object.values(uploadingFiles).some(v => v)) ? '#94a3b8' : BRAND.primary;
                   e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(30, 59, 139, 0.3)';
                 }}
               >
@@ -1217,6 +1613,11 @@ const RegisterMember: React.FC = () => {
                   <>
                     <div style={styles.spinner}></div>
                     <span>{t('processing')}</span>
+                  </>
+                ) : Object.values(uploadingFiles).some(v => v) ? (
+                  <>
+                    <div style={styles.spinner}></div>
+                    <span>{t('uploading_documents')}</span>
                   </>
                 ) : (
                   <>

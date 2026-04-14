@@ -3,9 +3,6 @@ import axios from 'axios';
 // Create an Axios instance with base configuration
 export const apiClient = axios.create({
   baseURL: 'http://142.132.180.209:4583/api/v1',
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 // Users API for profile view and management
@@ -113,6 +110,25 @@ export const membersAPI = {
   create: async (data: any, branchCode: number = 1) => {
     return apiClient.post(`/members?branchCode=${branchCode}`, data);
   },
+  uploadFile: async (file: File | Blob, userId: string, type: string) => {
+    const formData = new FormData();
+    const filename = (file as File).name || `${type.toLowerCase()}_${Date.now()}.png`;
+    
+    formData.append('file', file, filename);
+    
+    console.log('--- Uploading File ---');
+    console.log('File Object:', file);
+    console.log('UserId (Query Param):', userId);
+    console.log('Type (Query Param):', type);
+    
+    if (file.size === 0) {
+      throw new Error('File is empty');
+    }
+    
+    return apiClient.post(`/members/upload`, formData, {
+      params: { userId, type }
+    });
+  },
   delete: async (id: string) => {
     return apiClient.delete(`/members/${id}`);
   },
@@ -138,37 +154,3 @@ export const nomineesAPI = {
     return apiClient.delete(`/member-nominees/${id}`);
   }
 };
-
-// Attach JWT token to all requests if available
-apiClient.interceptors.request.use(
-  (config: any) => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('token');
-      if (token) {
-        config.headers = config.headers || {};
-        config.headers['Authorization'] = `Bearer ${token}`;
-      }
-    }
-    return config;
-  },
-  (error: any) => Promise.reject(error)
-);
-
-// Global response interceptor for handling 401 Unauthorized errors
-apiClient.interceptors.response.use(
-  (response: any) => response,
-  (error: any) => {
-    if (error.response && error.response.status === 401) {
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('token');
-        localStorage.removeItem('role');
-        localStorage.removeItem('username');
-        localStorage.removeItem('firstName');
-        localStorage.removeItem('lastName');
-        localStorage.removeItem('user');
-        window.location.href = '/login';
-      }
-    }
-    return Promise.reject(error);
-  }
-);

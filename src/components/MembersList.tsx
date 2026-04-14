@@ -17,7 +17,25 @@ import {
   Filter,
   Printer,
 } from "lucide-react"
-import { supabase, type Member } from "../lib/supabase"
+import { membersAPI } from "../utils/api"
+
+export type Member = {
+  id: string
+  full_name: string
+  father_name: string
+  grandfather_name: string
+  gender: string
+  region: string
+  woreda: string
+  city_kebele: string
+  occupation: string
+  id_fcn: string
+  phone_number: string
+  marital_status: string
+  digital_signature_url?: string
+  created_at: string
+  referrer_phone?: string
+}
 
 const MembersList: React.FC = () => {
   const { t } = useTranslation()
@@ -46,15 +64,33 @@ const MembersList: React.FC = () => {
 
   const fetchMembers = async () => {
     try {
-      const { data, error } = await supabase.from("members").select("*").order("created_at", { ascending: false })
+      setLoading(true);
+      const res = await membersAPI.getAll({ size: 200, sortDirection: 'DESC' });
+      
+      const rawData = res.data?.data || res.data || [];
+      
+      // Map backend fields to UI fields for backward compatibility with the table
+      const mappedData = Array.isArray(rawData) ? rawData.map((m: any) => ({
+        ...m,
+        id: m.id || m.memberCode || m.nationalId || Math.random().toString(),
+        full_name: m.name || m.firstName || m.full_name || 'N/A',
+        father_name: m.fatherName || m.middleName || m.father_name || '',
+        grandfather_name: m.surname || m.lastName || m.grandfather_name || '',
+        phone_number: m.contactInfo?.mobileNumber || m.mobileNumber || m.phone_number || m.phoneNumber || 'N/A',
+        city_kebele: m.addressInfo?.city || m.city || m.city_kebele || m.addressInfo?.subCity || 'N/A',
+        woreda: m.addressInfo?.woreda || m.woreda || 'N/A',
+        gender: m.gender || 'male',
+        occupation: m.educationEmploymentInfo?.educationLevel || m.occupation || 'N/A',
+        marital_status: m.maritalStatus || m.marital_status || 'N/A',
+        id_fcn: m.memberCode || m.nationalId || m.id_fcn || 'N/A',
+        created_at: m.membershipDate || m.created_at || new Date().toISOString()
+      })) : [];
 
-      if (error) throw error
-
-      setMembers(data || [])
+      setMembers(mappedData);
     } catch (error) {
-      console.error("Error fetching members:", error)
+      console.error("Error fetching members:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
