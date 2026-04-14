@@ -110,7 +110,7 @@ export const membersAPI = {
   create: async (data: any, branchCode: number = 1) => {
     return apiClient.post(`/members?branchCode=${branchCode}`, data);
   },
-  uploadFile: async (file: File | Blob, userId: string, type: string) => {
+  uploadFile: async (file: File | Blob, type: string) => {
     const formData = new FormData();
     const filename = (file as File).name || `${type.toLowerCase()}_${Date.now()}.png`;
     
@@ -118,7 +118,6 @@ export const membersAPI = {
     
     console.log('--- Uploading File ---');
     console.log('File Object:', file);
-    console.log('UserId (Query Param):', userId);
     console.log('Type (Query Param):', type);
     
     if (file.size === 0) {
@@ -126,7 +125,7 @@ export const membersAPI = {
     }
     
     return apiClient.post(`/members/upload`, formData, {
-      params: { userId, type }
+      params: { type }
     });
   },
   delete: async (id: string) => {
@@ -134,6 +133,9 @@ export const membersAPI = {
   },
   getStatistics: async () => {
     return apiClient.get('/members/statistics');
+  },
+  getFileUrl: (type: string, filename: string) => {
+    return `http://142.132.180.209:4583/api/v1/members/files/${type}/${filename}`;
   }
 };
 

@@ -147,7 +147,8 @@ const RegisterMember: React.FC = () => {
         idFront: 'nationalIdFrontUrl',
         idBack: 'nationalIdBackUrl',
         signature: 'digitalSignatureUrl',
-        receipt: 'registrationFeeReceiptUrl'
+        receipt: 'registrationFeeReceiptUrl',
+        profilePhoto: 'profilePhotoUrl'
       };
       setDocumentUrls(prev => ({ ...prev, [urlMap[name]]: '' }));
     }
@@ -163,7 +164,8 @@ const RegisterMember: React.FC = () => {
         idFront: 'NATIONAL_ID_FRONT',
         idBack: 'NATIONAL_ID_BACK',
         signature: 'SIGNATURE',
-        receipt: 'RECEIPT'
+        receipt: 'RECEIPT',
+        profilePhoto: 'PROFILE_PICTURE'
       };
 
       const urlMap: { [key: string]: string } = {
@@ -179,11 +181,16 @@ const RegisterMember: React.FC = () => {
         uploadData = dataURLtoBlob(file);
       }
 
-      const userId = getCurrentUserId();
-      const res = await membersAPI.uploadFile(uploadData, userId, typeMap[name]);
+      const res = await membersAPI.uploadFile(uploadData, typeMap[name]);
       
       if (res.data) {
-        setDocumentUrls(prev => ({ ...prev, [urlMap[name]]: res.data }));
+        // Handle response which could be the filename string or a full object
+        let fileUrl = res.data.url || res.data.filename || res.data;
+        if (typeof fileUrl === 'string' && !fileUrl.startsWith('http')) {
+          fileUrl = membersAPI.getFileUrl(typeMap[name], fileUrl);
+        }
+        
+        setDocumentUrls(prev => ({ ...prev, [urlMap[name]]: fileUrl }));
         setPendingFiles(prev => ({ ...prev, [name]: null }));
       }
     } catch (err) {
