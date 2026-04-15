@@ -13,9 +13,23 @@ const FileUpload: React.FC<FileUploadProps> = ({ label, onChange, accept = "imag
   const { t } = useTranslation()
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const MAX_FILE_SIZE = 2 * 1024 * 1024 // 2MB
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null
+    
+    if (selectedFile && selectedFile.size > MAX_FILE_SIZE) {
+      setError(t('file_size_error', { size: '2MB' }))
+      setFile(null)
+      setPreview(null)
+      onChange(null)
+      // Reset input value to allow selecting the same file after failure if needed
+      e.target.value = ''
+      return
+    }
+
+    setError(null)
     setFile(selectedFile)
     onChange(selectedFile)
 
@@ -33,13 +47,14 @@ const FileUpload: React.FC<FileUploadProps> = ({ label, onChange, accept = "imag
   const removeFile = () => {
     setFile(null)
     setPreview(null)
+    setError(null)
     onChange(null)
   }
 
   return (
     <div className="space-y-2">
       <label className="block text-sm font-medium text-gray-700">
-        {label} {required && <span className="text-primary">*</span>}
+        {label} {required && <span className="text-red-500">*</span>}
       </label>
       
       <div className="relative">
@@ -50,7 +65,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ label, onChange, accept = "imag
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
         />
         
-        <div className="border-2 border-dashed border-accent/40 rounded-lg p-4 bg-secondary text-center hover:border-primary-light transition-colors">
+        <div className={`border-2 border-dashed rounded-lg p-4 bg-secondary text-center hover:border-primary-light transition-colors ${error ? 'border-red-500' : 'border-accent/40'}`}>
           {preview ? (
             <div className="relative">
               <img
@@ -83,6 +98,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ label, onChange, accept = "imag
           )}
         </div>
       </div>
+      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
     </div>
   )
 }
