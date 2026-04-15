@@ -1,9 +1,24 @@
 import axios from 'axios';
+import { getAuthToken } from './jwt';
 
 // Create an Axios instance with base configuration
 export const apiClient = axios.create({
   baseURL: 'http://142.132.180.209:4583/api/v1',
 });
+
+// Add a request interceptor to include the JWT token
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = getAuthToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 // Users API for profile view and management
 export const usersAPI = {
