@@ -12,7 +12,25 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import MobileMenuBackdrop from './components/MobileMenuBackdrop'
 import RegistrationSummary from './components/RegistrationSummary'
+import Login from './components/Login'
+import { getUserRole, isAuthenticated } from './utils/jwt'
 import i18n from './i18n'
+
+// Protected Route Component
+const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactNode, allowedRoles: string[] }) => {
+  const auth = isAuthenticated()
+  const role = getUserRole()
+
+  if (!auth) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (allowedRoles && !allowedRoles.includes(role)) {
+    return <Navigate to="/" replace />
+  }
+
+  return <>{children}</>
+}
 
 function AppContent() {
   // const { t, i18n: i18nInstance } = useTranslation()
@@ -67,7 +85,15 @@ function AppContent() {
           <Route path="/" element={<LandingPage onContactClick={() => setIsContactModalOpen(true)} />} />
           <Route path="/register" element={<RegistrationForm />} />
           <Route path="/deposit" element={<MonthlyDeposit />} />
-          <Route path="/members" element={<MembersList />} />
+          <Route path="/login" element={<Login />} />
+          <Route 
+            path="/members" 
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN', 'TELLER']}>
+                <MembersList />
+              </ProtectedRoute>
+            } 
+          />
           <Route path="/registration-success/:id" element={<RegistrationSummary />} />
           {/* Redirect unknown routes to home */}
           <Route path="*" element={<Navigate to="/" />} />
