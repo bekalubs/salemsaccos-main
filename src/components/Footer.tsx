@@ -126,8 +126,8 @@ const Footer: React.FC = () => {
               <Phone className="text-accent flex-shrink-0" size={24} />
               <div>
                  <h4 className="font-bold text-white mb-2">{t('phone')}</h4>
-                 <p className="text-sm text-white/60">+251 910 4169 32</p>
-                 <p className="text-sm text-white/60">+251 911 123 456</p>
+                 <p className="text-sm text-white/60">0946154444</p>
+                 <p className="text-sm text-white/60">0946134444</p>
               </div>
            </div>
            <div className="flex gap-4 items-start">

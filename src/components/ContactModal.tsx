@@ -50,8 +50,8 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
                 <div>
                   <h3 className="font-bold text-gray-900 text-lg mb-2">{t('phone_numbers')}</h3>
                   <div className="space-y-1">
-                    <p className="text-gray-600 font-medium">+251 910 4169 32</p>
-                    <p className="text-gray-600 font-medium">+251 911 123 456</p>
+                    <p className="text-gray-600 font-medium">0946154444</p>
+                    <p className="text-gray-600 font-medium">0946134444</p>
                   </div>
                 </div>
               </div>

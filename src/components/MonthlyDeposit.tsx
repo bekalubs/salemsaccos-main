@@ -356,7 +356,8 @@ const MonthlyDeposit: React.FC = () => {
                   {t('info_new_member')}
                 </p>
                 <div className="p-4 bg-white/20 rounded-xl border border-white/10 text-center">
-                   <p className="text-2xl font-black font-mono tracking-tighter cursor-copy">+251 910 4169 32</p>
+                   <p className="text-2xl font-black font-mono tracking-tighter cursor-copy">0946154444</p>
+                                      <p className="text-2xl font-black font-mono tracking-tighter cursor-copy">0946134444</p>
                 </div>
             </div>
           </div>

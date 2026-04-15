@@ -319,8 +319,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
                   <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center text-accent flex-shrink-0"><Phone size={24} /></div>
                   <div>
                     <h4 className="font-bold text-gray-900">{t('phone')}</h4>
-                    <p className="text-gray-600">+251 910 4169 32</p>
-                    <p className="text-gray-600">+251 911 123 456</p>
+                    <p className="text-gray-600">0946154444</p>
+                    <p className="text-gray-600">0946134444</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
