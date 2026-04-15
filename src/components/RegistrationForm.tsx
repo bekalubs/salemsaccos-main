@@ -35,24 +35,23 @@ const RegisterMember: React.FC = () => {
   const [success, setSuccess] = useState(false);
 
   const [personalInfo, setPersonalInfo] = useState({
-    title: '',
+    title: 'Mr',
     firstName: '',
     middleName: '',
     lastName: '',
     fullNameAmharic: '',
     gender: 'MALE',
     dateOfBirth: '',
-    maritalStatus: 'SINGLE',
+    maritalStatus: '',
     nationality: 'Ethiopian',
     nationalId: '',
-    accountNumber: '',
     membershipDate: new Date().toISOString(),
     status: 'ACTIVE',
     isOrganizational: false,
     orgManagerName: '',
     tinNumber: '',
     motherName: '',
-    familySize: 1,
+    familySize: '',
     profilePhotoUrl: '',
     isDeleted: false,
   });
@@ -260,18 +259,53 @@ const RegisterMember: React.FC = () => {
 
     // Tab-specific validation before moving to next or submitting
     if (activeTab === 'personal') {
-      if (!personalInfo.firstName || !personalInfo.lastName || !personalInfo.gender || !personalInfo.dateOfBirth) {
-        setError(t('registration_error_detail'));
+      const isAmharic = (text: string) => /^[\u1200-\u137F\s]+$/.test(text);
+      const dob = new Date(personalInfo.dateOfBirth);
+      const today = new Date();
+      let age = today.getFullYear() - dob.getFullYear();
+      const m = today.getMonth() - dob.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+        age--;
+      }
+
+      if (!personalInfo.title || !personalInfo.firstName || !personalInfo.lastName || !personalInfo.fullNameAmharic || !personalInfo.gender || !personalInfo.dateOfBirth || !personalInfo.maritalStatus || !personalInfo.nationalId || !personalInfo.nationality || !personalInfo.motherName || !personalInfo.familySize) {
+        setError(t('all_fields_required'));
+        return;
+      }
+      if (personalInfo.fullNameAmharic && !isAmharic(personalInfo.fullNameAmharic)) {
+        setError(t('amharic_only_error'));
+        return;
+      }
+      if (dob > today) {
+        setError(t('dob_future_error'));
+        return;
+      }
+      if (age < 18) {
+        setError(t('age_limit_error'));
         return;
       }
     } else if (activeTab === 'contact') {
-      if (!contactInfo.mobileNumber) {
-        setError(t('phone_number_error'));
+      const phoneRegex = /^(?:\+251|0)[1-9]\d{8}$/;
+      if (!contactInfo.mobileNumber || !phoneRegex.test(contactInfo.mobileNumber)) {
+        setError(t('invalid_mobile_error'));
         return;
       }
+      if (referralInfo.referredByPhone && !phoneRegex.test(referralInfo.referredByPhone)) {
+        setError(t('invalid_referral_phone_error'));
+        return;
+      }
+      if (!addressInfo.region || !addressInfo.city || !addressInfo.subCity || !addressInfo.woreda) {
+        setError(t('address_required_error'));
+        return;
+      }
+    } else if (activeTab === 'documents') {
+      if (!documentUrls.nationalIdFrontUrl || !documentUrls.nationalIdBackUrl || !documentUrls.profilePhotoUrl || !documentUrls.digitalSignatureUrl) {
+         setError(t('documents_required_error'));
+         return;
+      }
     } else if (activeTab === 'payment') {
-      if (!paymentInfo.initialShares) {
-        setError(t('registration_error_detail'));
+      if (!paymentInfo.initialShares || !documentUrls.registrationFeeReceiptUrl) {
+        setError(t('payment_required_error'));
         return;
       }
     }
@@ -724,17 +758,18 @@ const RegisterMember: React.FC = () => {
                     <label style={styles.label}>
                       <User size={14} color={BRAND.primary} />
                       {t('title_label')}
+                       <span style={styles.requiredStar}>*</span>
                     </label>
-                    <input
-                      type="text"
+                    <select
                       name="title"
                       value={personalInfo.title}
                       onChange={handlePersonalChange}
-                      placeholder={t('title_placeholder')}
-                      style={styles.input}
-                      onFocus={(e) => e.currentTarget.style.borderColor = BRAND.primary}
-                      onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
-                    />
+                      style={styles.select}
+                    >
+                      <option value="Mr">Mr.</option>
+                      <option value="Ms">Ms.</option>
+                      <option value="Others">Others</option>
+                    </select>
                   </div>
                   <div style={styles.fieldGroup}>
                     <label style={styles.label}>
@@ -784,7 +819,10 @@ const RegisterMember: React.FC = () => {
                     />
                   </div>
                   <div style={styles.fieldGroup}>
-                    <label style={styles.label}>{t('full_name_amharic_label')}</label>
+                    <label style={styles.label}>
+                      <span style={styles.requiredStar}>*</span>
+                      {t('full_name_amharic_label')}
+                    </label>
                     <input
                       type="text"
                       name="fullNameAmharic"
@@ -828,13 +866,17 @@ const RegisterMember: React.FC = () => {
                     />
                   </div>
                   <div style={styles.fieldGroup}>
-                    <label style={styles.label}>{t('marital_status_label')}</label>
+                    <label style={styles.label}>
+                      {t('marital_status_label')}
+                      <span style={styles.requiredStar}>*</span>
+                    </label>
                     <select
                       name="maritalStatus"
                       value={personalInfo.maritalStatus}
                       onChange={handlePersonalChange}
                       style={styles.select}
                     >
+                      <option value="">{t('select_marital_status')}</option>
                       <option value="SINGLE">{t('marital_status_single')}</option>
                       <option value="MARRIED">{t('marital_status_married')}</option>
                       <option value="DIVORCED">{t('marital_status_divorced')}</option>
@@ -842,7 +884,10 @@ const RegisterMember: React.FC = () => {
                     </select>
                   </div>
                   <div style={styles.fieldGroup}>
-                    <label style={styles.label}>{t('national_id_label')}</label>
+                    <label style={styles.label}>
+                      {t('national_id_label')}
+                      <span style={styles.requiredStar}>*</span>
+                    </label>
                     <input
                       type="text"
                       name="nationalId"
@@ -855,7 +900,10 @@ const RegisterMember: React.FC = () => {
                     />
                   </div>
                   <div style={styles.fieldGroup}>
-                    <label style={styles.label}>{t('nationality_label')}</label>
+                    <label style={styles.label}>
+                      {t('nationality_label')}
+                      <span style={styles.requiredStar}>*</span>
+                    </label>
                     <input
                       type="text"
                       name="nationality"
@@ -867,7 +915,10 @@ const RegisterMember: React.FC = () => {
                     />
                   </div>
                   <div style={styles.fieldGroup}>
-                    <label style={styles.label}>{t('mother_name_label')}</label>
+                    <label style={styles.label}>
+                      {t('mother_name_label')}
+                      <span style={styles.requiredStar}>*</span>
+                    </label>
                     <input
                       type="text"
                       name="motherName"
@@ -880,26 +931,16 @@ const RegisterMember: React.FC = () => {
                     />
                   </div>
                   <div style={styles.fieldGroup}>
-                    <label style={styles.label}>{t('family_size_label')}</label>
+                    <label style={styles.label}>
+                      {t('family_size_label')}
+                      <span style={styles.requiredStar}>*</span>
+                    </label>
                     <input
                       type="number"
                       name="familySize"
                       value={personalInfo.familySize}
                       onChange={handlePersonalChange}
                       min="1"
-                      style={styles.input}
-                      onFocus={(e) => e.currentTarget.style.borderColor = BRAND.primary}
-                      onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
-                    />
-                  </div>
-                  <div style={styles.fieldGroup}>
-                    <label style={styles.label}>{t('account_number_label')}</label>
-                    <input
-                      type="text"
-                      name="accountNumber"
-                      value={personalInfo.accountNumber}
-                      onChange={handlePersonalChange}
-                      placeholder={t('account_number_placeholder')}
                       style={styles.input}
                       onFocus={(e) => e.currentTarget.style.borderColor = BRAND.primary}
                       onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
@@ -989,13 +1030,13 @@ const RegisterMember: React.FC = () => {
                     <label style={styles.label}>
                       <Smartphone size={14} color={BRAND.primary} />
                       {t('mobile_number_label')}
+                       <span style={styles.requiredStar}>*</span>
                     </label>
                     <input
                       type="tel"
                       name="mobileNumber"
                       value={contactInfo.mobileNumber}
                       onChange={handleContactChange}
-                      required
                       placeholder={t('mobile_number_placeholder')}
                       style={styles.input}
                       onFocus={(e) => e.currentTarget.style.borderColor = BRAND.primary}
@@ -1112,7 +1153,10 @@ const RegisterMember: React.FC = () => {
                     />
                   </div>
                   <div style={styles.fieldGroup}>
-                    <label style={styles.label}>{t('region_label')}</label>
+                    <label style={styles.label}>
+                      {t('region_label')}
+                      <span style={styles.requiredStar}>*</span>
+                    </label>
                     <input
                       type="text"
                       name="region"
@@ -1125,7 +1169,10 @@ const RegisterMember: React.FC = () => {
                     />
                   </div>
                   <div style={styles.fieldGroup}>
-                    <label style={styles.label}>{t('city_label')}</label>
+                    <label style={styles.label}>
+                      {t('city_label')}
+                      <span style={styles.requiredStar}>*</span>
+                    </label>
                     <input
                       type="text"
                       name="city"
@@ -1138,7 +1185,10 @@ const RegisterMember: React.FC = () => {
                     />
                   </div>
                   <div style={styles.fieldGroup}>
-                    <label style={styles.label}>{t('sub_city_label')}</label>
+                    <label style={styles.label}>
+                      {t('sub_city_label')}
+                      <span style={styles.requiredStar}>*</span>
+                    </label>
                     <input
                       type="text"
                       name="subCity"
@@ -1151,7 +1201,10 @@ const RegisterMember: React.FC = () => {
                     />
                   </div>
                   <div style={styles.fieldGroup}>
-                    <label style={styles.label}>{t('woreda_label')}</label>
+                    <label style={styles.label}>
+                      {t('woreda_label')}
+                      <span style={styles.requiredStar}>*</span>
+                    </label>
                     <input
                       type="text"
                       name="woreda"
@@ -1164,7 +1217,10 @@ const RegisterMember: React.FC = () => {
                     />
                   </div>
                   <div style={styles.fieldGroup}>
-                    <label style={styles.label}>{t('house_number_label')}</label>
+                    <label style={styles.label}>
+                      {t('house_number_label')}
+                      <span style={styles.requiredStar}>*</span>
+                    </label>
                     <input
                       type="text"
                       name="houseNumber"
@@ -1283,6 +1339,7 @@ const RegisterMember: React.FC = () => {
                     <div style={styles.fieldGroup}>
                       <FileUpload
                         label={t('id_front_label')}
+                        required
                         onChange={(file) => handleFileChange('idFront', file)}
                       />
                       {pendingFiles.idFront && !uploadingFiles.idFront && (
@@ -1302,6 +1359,7 @@ const RegisterMember: React.FC = () => {
                     <div style={styles.fieldGroup}>
                       <FileUpload
                         label={t('id_back_label')}
+                        required
                         onChange={(file) => handleFileChange('idBack', file)}
                       />
                       {pendingFiles.idBack && !uploadingFiles.idBack && (
@@ -1321,6 +1379,7 @@ const RegisterMember: React.FC = () => {
                     <div style={styles.fieldGroup}>
                       <FileUpload
                         label={t('profile_photo_label')}
+                        required
                         onChange={(file) => handleFileChange('profilePhoto', file)}
                       />
                       {pendingFiles.profilePhoto && !uploadingFiles.profilePhoto && (
@@ -1344,6 +1403,7 @@ const RegisterMember: React.FC = () => {
                   <h3 style={{ ...styles.label, fontSize: '16px', borderBottom: `2px solid ${BRAND.secondary}`, paddingBottom: '8px' }}>
                     <PenTool size={18} color={BRAND.primary} />
                     {t('digital_signature')}
+                    <span style={styles.requiredStar}>*</span>
                   </h3>
                   <div style={{ marginTop: '16px' }}>
                     <DigitalSignature
@@ -1538,6 +1598,7 @@ const RegisterMember: React.FC = () => {
                     <FileUpload
                       label={t('upload_receipt')}
                       accept="image/*,.pdf"
+                      required
                       onChange={(file) => handleFileChange('receipt', file)}
                     />
                     {pendingFiles.receipt && !uploadingFiles.receipt && (
@@ -1580,11 +1641,7 @@ const RegisterMember: React.FC = () => {
             {activeTab !== 'payment' && (
               <button
                 key="next-btn"
-                type="button"
-                onClick={() => {
-                  const currentIndex = tabs.findIndex(t => t.id === activeTab);
-                  if (currentIndex < tabs.length - 1) setActiveTab(tabs[currentIndex + 1].id);
-                }}
+                type="submit"
                 style={styles.submitButton}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-2px)';

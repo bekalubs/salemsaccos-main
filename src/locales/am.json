@@ -214,5 +214,16 @@
   "pm": "ከሰዓት",
   "noon": "ቀን",
   "view_details": "ዝርዝር ይመልከቱ",
-  "designed_by": "በሳሌም አይቲ ቡድን የተነደፈ"
+  "designed_by": "በሳሌም አይቲ ቡድን የተነደፈ",
+  "file_size_error": "የፋይል መጠን ከ {{size}} በታች መሆን አለበት",
+  "all_fields_required": "እባክዎን ሁሉንም አስፈላጊ መረጃዎች ይሙሉ",
+  "amharic_only_error": "ሙሉ ስም በአማርኛ ፊደላት መሆን አለበት",
+  "dob_future_error": "የትውልድ ቀን ወደፊት ሊሆን አይችልም",
+  "age_limit_error": "አባል ለመሆን ቢያንስ 18 ዓመት መሆን አለብዎት",
+  "invalid_mobile_error": "እባክዎን ትክክለኛ የሞባይል ቁጥር ያስገቡ (+251... ወይም 09...)",
+  "invalid_referral_phone_error": "እባክዎን ትክክለኛ የሪፈራል ስልክ ቁጥር ያስገቡ",
+  "address_required_error": "እባክዎን ሁሉንም የአድራሻ ዝርዝሮች ይሙሉ (ክልል፣ ከተማ፣ ክፍለ ከተማ፣ ወረዳ፣ የቤት ቁጥር)",
+  "documents_required_error": "ሁሉም ሰነዶች (መታወቂያ ፊት እና ጀርባ፣ ፕሮፋይል ፎቶ) እና ፊርማ ያስፈልጋሉ",
+  "payment_required_error": "የክፍያ ደረሰኝ እና የመጀመሪያ እጣዎች ያስፈልጋሉ",
+  "select_marital_status": "የጋብቻ ሁኔታ ይምረጡ"
 }

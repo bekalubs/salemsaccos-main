@@ -240,5 +240,16 @@
   "documents_preview": "Documents Preview",
   "initial_shares_label": "Initial Shares",
   "employer_name_placeholder": "Enter employer name",
-  "relationship_placeholder": "e.g., Spouse, Parent, Sibling"
+  "relationship_placeholder": "e.g., Spouse, Parent, Sibling",
+  "file_size_error": "File size must be under {{size}}",
+  "all_fields_required": "All required fields must be filled",
+  "amharic_only_error": "Full name must be in Amharic characters",
+  "dob_future_error": "Date of birth cannot be in the future",
+  "age_limit_error": "Member must be at least 18 years old",
+  "invalid_mobile_error": "Please enter a valid Ethiopian mobile number (+251... or 09...)",
+  "invalid_referral_phone_error": "Please enter a valid referral phone number",
+  "address_required_error": "Please fill in all address details (Region, City, Sub-city, Woreda, House Number)",
+  "documents_required_error": "All documents (ID Front, ID Back, Profile Photo) and your Signature are required",
+  "payment_required_error": "Payment receipt and initial shares are required",
+  "select_marital_status": "Select Marital Status"
 }
