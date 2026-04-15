@@ -18,75 +18,100 @@ import {
   Printer,
 } from "lucide-react"
 import { membersAPI } from "../utils/api"
+import MemberDetailView from "./MemberDetailView"
 
 export type Member = {
   id: string
-  full_name: string
-  father_name: string
-  grandfather_name: string
+  memberCode: string
+  title: string
+  firstName: string
+  middleName?: string
+  lastName: string
+  fullNameAmharic?: string
   gender: string
-  region: string
-  woreda: string
-  city_kebele: string
-  occupation: string
-  id_fcn: string
-  phone_number: string
-  marital_status: string
-  digital_signature_url?: string
-  created_at: string
-  referrer_phone?: string
+  dateOfBirth: string
+  maritalStatus: string
+  nationality: string
+  nationalId: string
+  contactInfo: {
+    mobileNumber: string
+    mobileNumber2?: string
+    officePhone?: string
+    email?: string
+  }
+  addressInfo: {
+    region: string
+    city: string
+    subCity?: string
+    woreda: string
+    houseNumber?: string
+  }
+  educationEmploymentInfo?: any
+  documents?: any
+  payment?: any
+  status: string
+  membershipDate: string
+  createdAt: string
+  profilePhotoUrl?: string
 }
 
 const MembersList: React.FC = () => {
   const { t } = useTranslation()
   const [members, setMembers] = useState<Member[]>([])
-  const [filteredMembers, setFilteredMembers] = useState<Member[]>([])
-  const [paginatedMembers, setPaginatedMembers] = useState<Member[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [searchCategory, setSearchCategory] = useState("all")
   const [regionFilter, setRegionFilter] = useState("all")
-  const [selectedMember, setSelectedMember] = useState<Member | null>(null)
+  const [selectedMember, setSelectedMember] = useState<any | null>(null)
   const [loading, setLoading] = useState(true)
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage, setCurrentPage] = useState(0) // 0-based for API
   const [itemsPerPage] = useState(10)
+  const [totalPages, setTotalPages] = useState(0)
+  const [totalElements, setTotalElements] = useState(0)
 
   useEffect(() => {
     fetchMembers()
-  }, [])
-
-  useEffect(() => {
-    filterMembers()
-  }, [searchTerm, searchCategory, regionFilter, members])
-
-  useEffect(() => {
-    paginateMembers()
-  }, [filteredMembers, currentPage])
+  }, [currentPage, searchTerm, searchCategory, regionFilter])
 
   const fetchMembers = async () => {
     try {
       setLoading(true);
-      const res = await membersAPI.getAll({ size: 200, sortDirection: 'DESC' });
-      
-      const rawData = res.data?.data || res.data || [];
-      
-      // Map backend fields to UI fields for backward compatibility with the table
-      const mappedData = Array.isArray(rawData) ? rawData.map((m: any) => ({
-        ...m,
-        id: m.id || m.memberCode || m.nationalId || Math.random().toString(),
-        full_name: m.name || m.firstName || m.full_name || 'N/A',
-        father_name: m.fatherName || m.middleName || m.father_name || '',
-        grandfather_name: m.surname || m.lastName || m.grandfather_name || '',
-        phone_number: m.contactInfo?.mobileNumber || m.mobileNumber || m.phone_number || m.phoneNumber || 'N/A',
-        city_kebele: m.addressInfo?.city || m.city || m.city_kebele || m.addressInfo?.subCity || 'N/A',
-        woreda: m.addressInfo?.woreda || m.woreda || 'N/A',
-        gender: m.gender || 'male',
-        occupation: m.educationEmploymentInfo?.educationLevel || m.occupation || 'N/A',
-        marital_status: m.maritalStatus || m.marital_status || 'N/A',
-        id_fcn: m.memberCode || m.nationalId || m.id_fcn || 'N/A',
-        created_at: m.membershipDate || m.created_at || new Date().toISOString()
-      })) : [];
+      const params: any = {
+        page: currentPage,
+        size: itemsPerPage,
+        sortDirection: 'DESC'
+      };
 
-      setMembers(mappedData);
+      if (searchTerm.trim()) {
+        if (searchCategory === 'name') params.name = searchTerm;
+        else if (searchCategory === 'phone') params.phone = searchTerm; 
+        else if (searchCategory === 'id') params.memberCode = searchTerm;
+        else params.name = searchTerm; // Default to name search
+      }
+
+      if (regionFilter !== 'all') {
+        // Backend doesn't have direct region filter in searchMembers params in spec, 
+        // but we can try if it supports it or just filter locally if not too many.
+        // For now, let's stick to name/surname/memberCode/nationalId/status
+      }
+
+      const res = await membersAPI.getAll(params);
+      
+      // Handle Spring Data Page object
+      const pageData = res.data?.data || res.data;
+      
+      if (pageData && pageData.content) {
+        setMembers(pageData.content);
+        setTotalPages(pageData.totalPages || 0);
+        setTotalElements(pageData.totalElements || 0);
+      } else if (Array.isArray(pageData)) {
+        setMembers(pageData);
+        setTotalElements(pageData.length);
+        setTotalPages(Math.ceil(pageData.length / itemsPerPage));
+      } else {
+        setMembers([]);
+        setTotalElements(0);
+        setTotalPages(0);
+      }
     } catch (error) {
       console.error("Error fetching members:", error);
     } finally {
@@ -94,63 +119,15 @@ const MembersList: React.FC = () => {
     }
   }
 
-  const filterMembers = () => {
-    let filtered = members
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setCurrentPage(0);
+    fetchMembers();
+  };
 
-    // Filter by region
-    if (regionFilter !== "all") {
-      filtered = filtered.filter((member) => member.region === regionFilter)
-    }
-
-    // Filter by search term and category
-    if (searchTerm.trim()) {
-      filtered = filtered.filter((member) => {
-        const term = searchTerm.toLowerCase()
-
-        switch (searchCategory) {
-          case "name":
-            return (
-              member.full_name.toLowerCase().includes(term) ||
-              member.father_name.toLowerCase().includes(term) ||
-              member.grandfather_name.toLowerCase().includes(term)
-            )
-          case "phone":
-            return member.phone_number.includes(term) || (member.referrer_phone && member.referrer_phone.includes(term))
-          case "address":
-            return (
-              member.city_kebele.toLowerCase().includes(term) ||
-              member.woreda.toLowerCase().includes(term) ||
-              member.region.toLowerCase().includes(term)
-            )
-          case "occupation":
-            return member.occupation.toLowerCase().includes(term)
-          case "id":
-            return member.id_fcn.includes(term)
-          default: // 'all'
-            return (
-              member.full_name.toLowerCase().includes(term) ||
-              member.father_name.toLowerCase().includes(term) ||
-              member.grandfather_name.toLowerCase().includes(term) ||
-              member.phone_number.includes(term) ||
-              member.city_kebele.toLowerCase().includes(term) ||
-              member.woreda.toLowerCase().includes(term) ||
-              member.occupation.toLowerCase().includes(term) ||
-              member.id_fcn.includes(term) ||
-              (member.referrer_phone && member.referrer_phone.includes(term))
-            )
-        }
-      })
-    }
-
-    setFilteredMembers(filtered)
-    setCurrentPage(1) // Reset to first page when filtering
-  }
-
-  const paginateMembers = () => {
-    const startIndex = (currentPage - 1) * itemsPerPage
-    const endIndex = startIndex + itemsPerPage
-    setPaginatedMembers(filteredMembers.slice(startIndex, endIndex))
-  }
+  // Local filtering is removed in favor of API search
+  const filterMembers = () => {}
+  const paginateMembers = () => {}
 
   const handlePrint = () => {
     const printWindow = window.open("", "_blank")
@@ -162,85 +139,61 @@ const MembersList: React.FC = () => {
         <head>
           <title>${t('saccos')} - ${t('members_list_report')}</title>
           <style>
-            body { font-family: Arial, sans-serif; margin: 20px; }
-            .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #1e3b8b; padding-bottom: 20px; }
-            .logo { color: #1e3b8b; font-size: 24px; font-weight: bold; margin-bottom: 10px; }
-            .subtitle { color: #666; font-size: 14px; }
-            .filters { margin-bottom: 20px; padding: 15px; background: #f8f6f5; border-radius: 8px; }
-            .filters h3 { margin: 0 0 10px 0; font-size: 16px; }
-            .filter-item { margin: 5px 0; font-size: 14px; }
-            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 12px; }
-            th { background-color: #1e3b8b; color: white; font-weight: bold; }
-            tr:nth-child(even) { background-color: #f8f6f5; }
-            .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #666; border-top: 1px solid #ddd; padding-top: 20px; }
-            @media print { body { margin: 0; } }
+            body { font-family: 'Inter', sans-serif; margin: 40px; color: #1e293b; line-height: 1.5; }
+            .header { text-align: center; margin-bottom: 40px; border-bottom: 3px solid #1e3b8b; padding-bottom: 20px; }
+            .logo { color: #1e3b8b; font-size: 28px; font-weight: 800; margin-bottom: 8px; text-transform: uppercase; letter-spacing: -0.025em; }
+            .subtitle { color: #64748b; font-size: 14px; font-weight: 500; }
+            .report-title { font-size: 20px; font-weight: 700; color: #1e3b8b; margin-top: 10px; }
+            .filters { margin-bottom: 30px; padding: 20px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+            .filter-item { font-size: 13px; color: #475569; }
+            .filter-item strong { color: #1e293b; }
+            table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
+            th, td { padding: 12px 15px; text-align: left; font-size: 11px; border-bottom: 1px solid #e2e8f0; }
+            th { background-color: #f1f5f9; color: #475569; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+            tr:last-child td { border-bottom: none; }
+            tr:nth-child(even) { background-color: #f8fafc; }
+            .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 20px; }
+            @media print { .no-print { display: none; } body { margin: 20px; } }
           </style>
         </head>
         <body>
           <div class="header">
-            <div class="logo">${t('saccos')}</div>
-            <div class="subtitle">${t('saccos_desc')}</div>
-            <div class="subtitle">${t('members_list_report')}</div>
+            <div class="logo">SALEM SACCOS</div>
+            <div class="subtitle">Empowering Through Cooperation</div>
+            <div class="report-title">${t('members_list_report')}</div>
           </div>
           
           <div class="filters">
-            <h3>${t('filter_info')}:</h3>
-            <div class="filter-item"><strong>${t('region')}:</strong> ${regionFilter === "all" ? t('all') : regionFilter}</div>
-            <div class="filter-item"><strong>${t('search_category')}:</strong> ${
-              searchCategory === "all"
-                ? t('all')
-                : searchCategory === "name"
-                  ? t('name')
-                  : searchCategory === "phone"
-                    ? t('phone_number')
-                    : searchCategory === "address"
-                      ? t('address')
-                      : searchCategory === "occupation"
-                        ? t('occupation')
-                        : searchCategory === "id"
-                          ? t('id')
-                          : searchCategory
-            }</div>
-            <div class="filter-item"><strong>${t('search_term')}:</strong> ${searchTerm || t('none')}</div>
-            <div class="filter-item"><strong>${t('total_results')}:</strong> ${filteredMembers.length} ${t('members')}</div>
-            <div class="filter-item"><strong>${t('print_date')}:</strong> ${new Date().toLocaleDateString("am-ET")}</div>
+            <div class="filter-item"><strong>Generated On:</strong> ${new Date().toLocaleString()}</div>
+            <div class="filter-item"><strong>Total Records:</strong> ${totalElements}</div>
+            <div class="filter-item"><strong>Search Content:</strong> ${searchTerm || 'None'}</div>
+            <div class="filter-item"><strong>Filter:</strong> ${regionFilter === 'all' ? 'All Regions' : regionFilter}</div>
           </div>
           
           <table>
             <thead>
               <tr>
-                <th>${t('serial_number')}</th>
-                <th>${t('full_name')}</th>
-                <th>${t('father_name')}</th>
-                <th>${t('grandfather_name')}</th>
-                <th>${t('gender')}</th>
-                <th>${t('region')}</th>
-                <th>${t('woreda')}</th>
-                <th>${t('city_kebele')}</th>
-                <th>${t('phone_number')}</th>
-                <th>${t('occupation')}</th>
-                <th>${t('marital_status')}</th>
-                <th>${t('registration_date')}</th>
+                <th>Code</th>
+                <th>Full Name</th>
+                <th>Gender</th>
+                <th>Phone</th>
+                <th>Region</th>
+                <th>Status</th>
+                <th>Reg. Date</th>
               </tr>
             </thead>
             <tbody>
-              ${filteredMembers
+              ${members
                 .map(
-                  (member, index) => `
+                  (member) => `
                 <tr>
-                  <td>${index + 1}</td>
-                  <td>${member.full_name}</td>
-                  <td>${member.father_name}</td>
-                  <td>${member.grandfather_name}</td>
-                  <td>${member.gender === "male" ? t('male') : t('female')}</td>
-                  <td>${member.region}</td>
-                  <td>${member.woreda}</td>
-                  <td>${member.city_kebele}</td>
-                  <td>${member.phone_number}</td>
-                  <td>${member.occupation}</td>
-                  <td>${member.marital_status}</td>
-                  <td>${formatDate(member.created_at)}</td>
+                  <td>${member.memberCode}</td>
+                  <td>${member.firstName} ${member.lastName}</td>
+                  <td>${member.gender}</td>
+                  <td>${member.contactInfo?.mobileNumber || 'N/A'}</td>
+                  <td>${member.addressInfo?.region || 'N/A'}</td>
+                  <td>${member.status}</td>
+                  <td>${new Date(member.membershipDate).toLocaleDateString()}</td>
                 </tr>
               `,
                 )
@@ -249,9 +202,8 @@ const MembersList: React.FC = () => {
           </table>
           
           <div class="footer">
-            <p>${t('footer_saccos')}</p>
-            <p>${t('footer_contact')}</p>
-            <p>${t('addis_ababa_ethiopia')}</p>
+            <p>© ${new Date().getFullYear()} Salem Saccos. All Rights Reserved.</p>
+            <p>Addis Ababa, Ethiopia</p>
           </div>
         </body>
       </html>
@@ -267,24 +219,24 @@ const MembersList: React.FC = () => {
   }
 
   const getUniqueRegions = () => {
-    const regions = [...new Set(members.map((member) => member.region))]
-    return regions.sort()
+    return [
+      "Addis Ababa", "Afar", "Amhara", "Benishangul-Gumuz", "Dire Dawa", 
+      "Gambela", "Harari", "Oromia", "Sidama", "SNNPR", "South West", "Tigray"
+    ]
   }
 
-  const totalPages = Math.ceil(filteredMembers.length / itemsPerPage)
-
   const goToPage = (page: number) => {
-    setCurrentPage(page)
+    setCurrentPage(page - 1)
   }
 
   const goToPreviousPage = () => {
-    if (currentPage > 1) {
+    if (currentPage > 0) {
       setCurrentPage(currentPage - 1)
     }
   }
 
   const goToNextPage = () => {
-    if (currentPage < totalPages) {
+    if (currentPage < totalPages - 1) {
       setCurrentPage(currentPage + 1)
     }
   }
@@ -297,105 +249,40 @@ const MembersList: React.FC = () => {
     })
   }
 
-  const MemberDetailModal = ({ member, onClose }: { member: Member; onClose: () => void }) => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b p-4 flex justify-between items-center">
-          <h2 className="text-xl font-bold text-gray-900">{t('member_detail_info')}</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-            <X className="w-6 h-6" />
+  const MemberDetailModal = ({ member, onClose }: { member: any; onClose: () => void }) => (
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-in fade-in duration-300">
+      <div className="bg-white rounded-3xl shadow-2xl max-w-5xl w-full max-h-[92vh] overflow-hidden flex flex-col transform transition-all scale-100 opacity-100">
+        <div className="sticky top-0 bg-white border-b px-8 py-6 flex justify-between items-center z-10">
+          <div>
+            <h2 className="text-2xl font-black text-slate-800 tracking-tight">{t('member_detail_info')}</h2>
+            <p className="text-slate-500 text-sm font-medium">Viewing complete record for {member.firstName} {member.lastName}</p>
+          </div>
+          <button 
+            onClick={onClose} 
+            className="p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-600 transition-colors"
+          >
+            <X className="w-8 h-8" />
           </button>
         </div>
 
-        <div className="p-6 space-y-6">
-          {/* Personal Information */}
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-semibold text-gray-900 mb-3">{t('personal_info')}</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium text-gray-700">{t('full_name')}:</span>
-                <span className="ml-2">{member.full_name}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-700">{t('father_name')}:</span>
-                <span className="ml-2">{member.father_name}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-700">{t('grandfather_name')}:</span>
-                <span className="ml-2">{member.grandfather_name}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-700">{t('gender')}:</span>
-                <span className="ml-2">{member.gender === "male" ? t('male') : t('female')}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-700">{t('marital_status')}:</span>
-                <span className="ml-2">{member.marital_status}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-700">{t('occupation_education')}:</span>
-                <span className="ml-2">{member.occupation}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Contact Information */}
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-semibold text-gray-900 mb-3">{t('contact_info')}</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium text-gray-700">{t('region')}:</span>
-                <span className="ml-2">{member.region}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-700">{t('woreda')}:</span>
-                <span className="ml-2">{member.woreda}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-700">{t('city_kebele')}:</span>
-                <span className="ml-2">{member.city_kebele}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-700">{t('phone_number')}:</span>
-                <span className="ml-2">{member.phone_number}</span>
-              </div>
-              {member.referrer_phone && (
-                <div>
-                  <span className="font-medium text-gray-700">{t('referrer_phone')}:</span>
-                  <span className="ml-2">{member.referrer_phone}</span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* ID Information */}
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-semibold text-gray-900 mb-3">{t('id_info')}</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium text-gray-700">{t('id_fcn')}:</span>
-                <span className="ml-2">{member.id_fcn}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Digital Signature */}
-          {member.digital_signature_url && (
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="font-semibold text-gray-900 mb-3">{t('digital_signature')}</h3>
-              <img
-                src={member.digital_signature_url || "/placeholder.svg"}
-                alt="Digital Signature"
-                className="max-w-xs border border-gray-300 rounded"
-              />
-            </div>
-          )}
-
-          {/* Registration Date */}
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-semibold text-gray-900 mb-3">{t('registration_date')}</h3>
-            <p className="text-sm text-gray-700">{formatDate(member.created_at)}</p>
-          </div>
+        <div className="p-8 overflow-y-auto bg-slate-50/50">
+          <MemberDetailView member={member} />
+        </div>
+        
+        <div className="bg-white border-t p-6 flex justify-end gap-3">
+          <button 
+            onClick={onClose}
+            className="px-8 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200 transition-colors"
+          >
+            {t('close')}
+          </button>
+          <button 
+            onClick={() => window.print()}
+            className="px-8 py-3 bg-blue-900 text-white rounded-xl font-bold hover:bg-blue-800 transition-all shadow-lg flex items-center gap-2"
+          >
+            <Printer size={18} />
+            {t('print_record')}
+          </button>
         </div>
       </div>
     </div>
@@ -412,44 +299,43 @@ const MembersList: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto p-6">
       <div className="bg-white rounded-lg shadow-lg">
-        <div className="p-6 border-b">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="p-8 border-b">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center">
-                <Users className="w-6 h-6 mr-2" />
+              <h1 className="text-4xl font-black text-slate-800 flex items-center tracking-tight">
+                <Users className="w-10 h-10 mr-4 text-blue-900" />
                 {t('registered_members')}
               </h1>
-              <p className="text-gray-600 mt-1">
-                {t('total')} {filteredMembers.length} {t('members')} {t('registered')}
-                {filteredMembers.length !== members.length && ` (${t('from')} ${members.length} ${t('total')})`}
+              <p className="text-slate-500 mt-2 font-medium">
+                {t('total')} <span className="text-blue-900 font-bold">{totalElements}</span> {t('members')} {t('registered')}
               </p>
             </div>
 
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <form onSubmit={handleSearch} className="relative w-full md:w-96">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
               <input
                 type="text"
                 placeholder={t('search_placeholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-secondary-dark rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent w-full md:w-80 outline-none transition-all"
+                className="pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-900 w-full outline-none transition-all font-medium text-slate-700 shadow-sm hover:bg-white"
               />
-            </div>
+            </form>
           </div>
         </div>
 
-        <div className="p-6 border-b bg-gray-50">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="p-8 border-b bg-slate-50/50">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {/* Region Filter */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <Filter className="inline w-4 h-4 mr-1" />
+            <div className="md:col-span-1">
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+                <Filter className="inline w-3 h-3 mr-1" />
                 {t('region_filter')}
               </label>
               <select
                 value={regionFilter}
                 onChange={(e) => setRegionFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-secondary-dark rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 bg-white border-2 border-slate-100 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-900 outline-none transition-all font-bold text-slate-700"
               >
                 <option value="all">{t('all_regions')}</option>
                 {getUniqueRegions().map((region) => (
@@ -461,87 +347,122 @@ const MembersList: React.FC = () => {
             </div>
 
             {/* Search Category */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t('search_category')}</label>
+            <div className="md:col-span-1">
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">{t('search_category')}</label>
               <select
                 value={searchCategory}
                 onChange={(e) => setSearchCategory(e.target.value)}
-                className="w-full px-3 py-2 border border-secondary-dark rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 bg-white border-2 border-slate-100 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-900 outline-none transition-all font-bold text-slate-700"
               >
                 <option value="all">{t('all')}</option>
                 <option value="name">{t('name')}</option>
                 <option value="phone">{t('phone_number')}</option>
-                <option value="address">{t('address')}</option>
-                <option value="occupation">{t('occupation')}</option>
-                <option value="id">{t('id')}</option>
+                <option value="id">{t('member_code')}</option>
               </select>
+            </div>
+
+            {/* Stats Summary (Hidden on mobile) */}
+            <div className="hidden md:flex flex-col justify-end">
+               <p className="text-[10px] text-slate-400 font-bold uppercase mb-3">QUICK STATS</p>
+               <div className="flex gap-4">
+                  <div className="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-xs font-black uppercase tracking-tighter">
+                    {totalElements} Active
+                  </div>
+                  <div className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-black uppercase tracking-tighter">
+                    {totalPages} Pages
+                  </div>
+               </div>
             </div>
 
             {/* Print Button */}
             <div className="flex items-end">
               <button
                 onClick={handlePrint}
-                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors w-full justify-center"
+                className="flex items-center px-6 py-3 bg-blue-900 text-white rounded-xl hover:bg-blue-800 transition-all w-full justify-center font-bold shadow-lg shadow-blue-900/20 active:scale-95"
               >
-                <Printer className="w-4 h-4 mr-2" />
-                {t('print')}
+                <Printer className="w-5 h-5 mr-2" />
+                {t('print_report')}
               </button>
             </div>
           </div>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('name')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('phone_number')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('address')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('gender')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('occupation')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('registration_date')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('actions')}</th>
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-slate-50/50">
+                <th className="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">{t('member')}</th>
+                <th className="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">{t('contact')}</th>
+                <th className="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">{t('location')}</th>
+                <th className="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">{t('status')}</th>
+                <th className="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">{t('registration')}</th>
+                <th className="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">{t('actions')}</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {paginatedMembers.map((member) => (
-                <tr key={member.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{member.full_name}</div>
-                    <div className="text-sm text-gray-500">
-                      {member.father_name} {member.grandfather_name}
+            <tbody className="bg-white divide-y divide-slate-100">
+              {members.map((member) => (
+                <tr key={member.id} className="group hover:bg-blue-50/30 transition-colors">
+                  <td className="px-8 py-6 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="h-12 w-12 rounded-xl bg-blue-900/5 flex items-center justify-center text-blue-900 font-black text-lg overflow-hidden border-2 border-white shadow-sm ring-1 ring-slate-100">
+                        {member.profilePhotoUrl ? (
+                          <img 
+                            src={`http://142.132.180.209:4583${member.profilePhotoUrl.startsWith('/') ? '' : '/'}${member.profilePhotoUrl}`} 
+                            alt="" 
+                            className="h-full w-full object-cover" 
+                            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                          />
+                        ) : (
+                          member.firstName?.charAt(0)
+                        )}
+                      </div>
+                      <div className="ml-4">
+                        <div className="text-sm font-black text-slate-800 uppercase tracking-tight">
+                          {member.firstName} {member.lastName}
+                        </div>
+                        <div className="text-[10px] font-mono font-bold text-slate-400 mt-0.5">
+                          {member.memberCode}
+                        </div>
+                      </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center text-sm text-gray-900">
-                      <Phone className="w-4 h-4 mr-1" />
-                      {member.phone_number}
+                  <td className="px-8 py-6 whitespace-nowrap">
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                        <Phone size={12} className="text-slate-400" />
+                        {member.contactInfo?.mobileNumber || 'N/A'}
+                      </span>
+                      <span className="text-[10px] text-slate-400 mt-1 font-medium">{member.contactInfo?.email || 'No email provided'}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center text-sm text-gray-900">
-                      <MapPin className="w-4 h-4 mr-1" />
-                      {member.city_kebele}, {member.woreda}
+                  <td className="px-8 py-6 whitespace-nowrap">
+                    <div className="flex items-center text-sm font-bold text-slate-600">
+                      <MapPin className="w-4 h-4 mr-2 text-slate-400" />
+                      {member.addressInfo?.city || 'N/A'}, {member.addressInfo?.region || 'N/A'}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {member.gender === "male" ? t('male') : t('female')}
+                  <td className="px-8 py-6 whitespace-nowrap">
+                    <span className={`inline-flex items-center px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${
+                      member.status === 'ACTIVE' 
+                        ? 'bg-green-100 text-green-700' 
+                        : 'bg-amber-100 text-amber-700'
+                    }`}>
+                      {member.status}
+                    </span>
                   </td>
-                  {/* Occupation Column */}
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{member.occupation}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center text-sm text-gray-900">
-                      <Calendar className="w-4 h-4 mr-1" />
-                      {formatDate(member.created_at)}
+                  <td className="px-8 py-6 whitespace-nowrap">
+                    <div className="flex items-center text-sm font-bold text-slate-600">
+                      <Calendar className="w-4 h-4 mr-2 text-slate-400" />
+                      {formatDate(member.membershipDate || member.createdAt)}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-8 py-6 whitespace-nowrap">
                     <button
                       onClick={() => setSelectedMember(member)}
-                      className="flex items-center text-primary hover:text-primary-dark text-sm font-medium transition-colors"
+                      className="inline-flex items-center px-4 py-2 bg-white border border-slate-200 rounded-lg text-[11px] font-bold text-slate-700 hover:bg-blue-900 hover:text-white hover:border-blue-900 transition-all shadow-sm active:scale-95"
                     >
-                      <Eye className="w-4 h-4 mr-1" />
-                      {t('view_details')}
+                      <Eye className="w-3 h-3 mr-2" />
+                      {t('view_full_profile')}
                     </button>
                   </td>
                 </tr>
@@ -549,56 +470,59 @@ const MembersList: React.FC = () => {
             </tbody>
           </table>
 
-          {paginatedMembers.length === 0 && filteredMembers.length === 0 && (
-            <div className="text-center py-12">
-              <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">{searchTerm ? t('no_results') : t('no_members_yet')}</p>
+          {members.length === 0 && (
+            <div className="text-center py-20 bg-slate-50/30">
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-slate-100 rounded-full mb-6">
+                 <FileText className="w-10 h-10 text-slate-300" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-800">{t('no_members_found')}</h3>
+              <p className="text-slate-400 mt-2 font-medium">{searchTerm ? t('try_adjusting_search') : t('start_by_registering')}</p>
             </div>
           )}
         </div>
 
         {/* Pagination */}
-        {filteredMembers.length > 0 && totalPages > 1 && (
-          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-700">
-                {t('from_result', { from: (currentPage - 1) * itemsPerPage + 1, to: Math.min(currentPage * itemsPerPage, filteredMembers.length), total: filteredMembers.length })}
+        {totalElements > 0 && totalPages > 1 && (
+          <div className="px-8 py-6 border-t border-slate-100 bg-slate-50/50">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="text-sm font-bold text-slate-400 uppercase tracking-widest">
+                {t('showing')} <span className="text-slate-800">{currentPage * itemsPerPage + 1}</span> {t('to')} <span className="text-slate-800">{Math.min((currentPage + 1) * itemsPerPage, totalElements)}</span> {t('of')} <span className="text-slate-800">{totalElements}</span> {t('entries')}
               </div>
 
               {/* Pagination Controls */}
               <div className="flex items-center space-x-2">
                 <button
                   onClick={goToPreviousPage}
-                  disabled={currentPage === 1}
-                  className="flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={currentPage === 0}
+                  className="flex items-center px-4 py-2 text-[11px] font-black uppercase tracking-widest text-slate-500 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-sm"
                 >
                   <ChevronLeft className="w-4 h-4 mr-1" />
-                  {t('previous')}
+                  {t('prev')}
                 </button>
 
                 <div className="flex space-x-1">
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
                     // Show first page, last page, current page, and pages around current page
-                    if (page === 1 || page === totalPages || (page >= currentPage - 1 && page <= currentPage + 1)) {
+                    if (page === 1 || page === totalPages || (page >= currentPage && page <= currentPage + 2)) {
                       return (
                         <button
                           key={page}
                           onClick={() => goToPage(page)}
-                          className={`px-3 py-2 text-sm font-medium rounded-lg transition-all ${
-                            page === currentPage
-                              ? "bg-primary text-white shadow-md"
-                              : "text-gray-700 bg-white border border-gray-300 hover:bg-secondary"
+                          className={`w-10 h-10 flex items-center justify-center text-[11px] font-black rounded-xl transition-all ${
+                            page === currentPage + 1
+                              ? "bg-blue-900 text-white shadow-xl shadow-blue-900/20"
+                              : "text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 shadow-sm"
                           }`}
                         >
                           {page}
                         </button>
                       )
                     } else if (
-                      (page === currentPage - 2 && currentPage > 3) ||
-                      (page === currentPage + 2 && currentPage < totalPages - 2)
+                      (page === currentPage - 1 && currentPage > 2) ||
+                      (page === currentPage + 3 && currentPage < totalPages - 3)
                     ) {
                       return (
-                        <span key={page} className="px-2 py-2 text-sm text-gray-500">
+                        <span key={page} className="w-10 h-10 flex items-end justify-center text-slate-400 font-bold">
                           ...
                         </span>
                       )
@@ -609,8 +533,8 @@ const MembersList: React.FC = () => {
 
                 <button
                   onClick={goToNextPage}
-                  disabled={currentPage === totalPages}
-                  className="flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={currentPage === totalPages - 1}
+                  className="flex items-center px-4 py-2 text-[11px] font-black uppercase tracking-widest text-slate-500 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-sm"
                 >
                   {t('next')}
                   <ChevronRight className="w-4 h-4 ml-1" />
