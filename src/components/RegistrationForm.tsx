@@ -294,7 +294,8 @@ const RegisterMember: React.FC = () => {
         setError(t('invalid_referral_phone_error'));
         return;
       }
-      if (!addressInfo.region || !addressInfo.city || !addressInfo.subCity || !addressInfo.woreda) {
+    } else if (activeTab === 'address') {
+      if (!addressInfo.region || !addressInfo.city || !addressInfo.subCity || !addressInfo.woreda || !addressInfo.houseNumber) {
         setError(t('address_required_error'));
         return;
       }
