@@ -32,7 +32,7 @@ const RegistrationSummary: React.FC = () => {
     accentDark: '#d4962a'
   };
 
-  const API_BASE_URL = 'http://142.132.180.209:4583';
+  const API_BASE_URL = 'https://api.v1.temp.salemsaccos.com';
 
   useEffect(() => {
     const fetchMember = async () => {

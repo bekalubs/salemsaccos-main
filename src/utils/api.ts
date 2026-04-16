@@ -3,7 +3,7 @@ import { getAuthToken, isTokenExpired, clearAuthData } from './jwt';
 
 // Create an Axios instance with base configuration
 export const apiClient = axios.create({
-  baseURL: 'http://142.132.180.209:4583/api/v1',
+  baseURL: 'https://api.v1.temp.salemsaccos.com/api/v1',
 });
 
 // Add a request interceptor to include the JWT token
@@ -185,7 +185,7 @@ export const membersAPI = {
     return apiClient.get('/members/statistics');
   },
   getFileUrl: (type: string, filename: string) => {
-    return `http://142.132.180.209:4583/api/v1/members/files/${type}/${filename}`;
+    return `https://api.v1.temp.salemsaccos.com/api/v1/members/files/${type}/${filename}`;
   }
 };
 

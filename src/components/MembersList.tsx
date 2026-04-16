@@ -345,7 +345,7 @@ const MembersList: React.FC = () => {
                   <td className="px-8 py-6 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="h-14 w-14 rounded-2xl bg-slate-100 flex items-center justify-center text-blue-900 font-black text-xl overflow-hidden shadow-inner ring-4 ring-white group-hover:ring-blue-100 transition-all">
-                        {m.profilePhotoUrl ? <img src={`http://142.132.180.209:4583${m.profilePhotoUrl}`} className="w-full h-full object-cover" /> : m.firstName?.charAt(0)}
+                        {m.profilePhotoUrl ? <img src={`https://api.v1.temp.salemsaccos.com${m.profilePhotoUrl}`} className="w-full h-full object-cover" /> : m.firstName?.charAt(0)}
                       </div>
                       <div className="ml-5">
                         <p className="text-sm font-black text-slate-800 uppercase tracking-tight mb-0.5">{m.firstName} {m.lastName}</p>
