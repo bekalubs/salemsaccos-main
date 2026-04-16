@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getAuthToken } from './jwt';
+import { getAuthToken, isTokenExpired, clearAuthData } from './jwt';
 
 // Create an Axios instance with base configuration
 export const apiClient = axios.create({
@@ -9,13 +9,48 @@ export const apiClient = axios.create({
 // Add a request interceptor to include the JWT token
 apiClient.interceptors.request.use(
   (config) => {
+    // Check if the request is for public routes (registration or file upload)
+    const url = config.url?.split('?')[0];
+    const isPublicRoute = (url === '/members' && config.method === 'post') || 
+                          (url === '/members/upload' && config.method === 'post') ||
+                          url?.includes('/users/login');
+
+    if (isPublicRoute) {
+      // Don't add token for public registration/upload/login
+      return config;
+    }
+
     const token = getAuthToken();
     if (token) {
+      if (isTokenExpired(token)) {
+        clearAuthData();
+        // Redirect to login if on protected route? 
+        // For now just don't add the token and let the backend 401
+        return config;
+      }
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add a response interceptor to handle 401/403 errors
+apiClient.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      console.warn('Unauthorized/Forbidden access. Clearing auth data and logging out.');
+      clearAuthData();
+      // Only reload if we were previously logged in to avoid infinite loops on login page
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    }
     return Promise.reject(error);
   }
 );

@@ -22,8 +22,36 @@ export const clearAuthData = () => {
   localStorage.removeItem(USER_KEY);
 };
 
+export const parseJwt = (token: string) => {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    return null;
+  }
+};
+
+export const isTokenExpired = (token: string) => {
+  const decoded = parseJwt(token);
+  if (!decoded || !decoded.exp) return true;
+  
+  const currentTime = Math.floor(Date.now() / 1000);
+  return decoded.exp < currentTime;
+};
+
 export const isAuthenticated = () => {
-  return !!getAuthToken();
+  const token = getAuthToken();
+  if (!token) return false;
+  if (isTokenExpired(token)) {
+    clearAuthData();
+    return false;
+  }
+  return true;
 };
 
 export const getUserRole = () => {
@@ -33,5 +61,5 @@ export const getUserRole = () => {
 
 export const getCurrentUserId = () => {
   const user = getUserData();
-  return user?.username || '965400d7-0e27-4419-940a-0ad529d738e5'; // Default mock for backward compatibility if needed
+  return user?.username || null;
 };
