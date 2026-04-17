@@ -151,7 +151,7 @@ const MonthlyDeposit: React.FC = () => {
                    </p>
 
                    <a 
-                     href="https://t.me/gutudanii" 
+                     href="https://t.me/BBS1221" 
                      target="_blank" 
                      rel="noopener noreferrer"
                      className="inline-flex items-center gap-4 bg-[#0088cc] text-white px-10 py-5 rounded-3xl font-black hover:bg-[#0077b5] transition-all transform hover:scale-105 shadow-xl shadow-[#0088cc]/20 group"
