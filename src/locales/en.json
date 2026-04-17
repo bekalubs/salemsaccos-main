@@ -251,5 +251,8 @@
   "address_required_error": "Please fill in all address details (Region, City, Sub-city, Woreda, House Number)",
   "documents_required_error": "All documents (ID Front, ID Back, Profile Photo) and your Signature are required",
   "payment_required_error": "Payment receipt and initial shares are required",
-  "select_marital_status": "Select Marital Status"
+  "select_marital_status": "Select Marital Status",
+  "coming_soon": "Portal Under Maintenance",
+  "maintenance_msg": "We are currently upgrading our automated deposit systems to serve you better. This portal will be fully operational on Monday, April 20.",
+  "contact_staff": "Contact Staff on Telegram (@gutudanii)"
 }

@@ -11,7 +11,10 @@ import {
   AlertCircle,
   Loader2,
   Building2,
-  Check
+  Check,
+  Construction,
+  Send,
+  Calendar
 } from 'lucide-react';
 import FileUpload from './FileUpload';
 
@@ -21,6 +24,9 @@ const MonthlyDeposit: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+
+  // Maintenance Mode is currently ACTIVE
+  const isMaintenance = true;
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -67,6 +73,8 @@ const MonthlyDeposit: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isMaintenance) return; // double safety
+
     if (!formData.destinationBank) {
       setError('Please select a destination bank account');
       return;
@@ -96,6 +104,68 @@ const MonthlyDeposit: React.FC = () => {
     label: "block text-sm font-bold text-gray-700 mb-2 uppercase tracking-widest",
     card: "bg-white p-8 lg:p-10 rounded-[2.5rem] shadow-2xl border border-gray-100"
   };
+
+  if (isMaintenance) {
+    return (
+      <div className="min-h-screen pt-32 pb-20 px-6 bg-[#f8f6f5] flex items-center justify-center">
+        <div className="max-w-3xl w-full">
+          <button 
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2 text-gray-400 hover:text-[#1e3b8b] font-bold mb-12 transition-colors group"
+          >
+            <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+            {t('back_to_home')}
+          </button>
+
+          <div className="bg-white rounded-[3rem] p-10 lg:p-20 shadow-2xl border border-gray-100 text-center relative overflow-hidden">
+             {/* Background Decorative Elements */}
+             <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#f4ac37]/5 rounded-full blur-3xl" />
+             <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-[#1e3b8b]/5 rounded-full blur-3xl" />
+             
+             <div className="relative z-10">
+                <div className="w-24 h-24 bg-[#f4ac37]/10 text-[#f4ac37] rounded-3xl flex items-center justify-center mx-auto mb-10 transform hover:rotate-12 transition-transform duration-500">
+                  <Construction size={48} />
+                </div>
+                
+                <h1 className="text-4xl lg:text-5xl font-black text-[#1e3b8b] mb-6 tracking-tight">
+                  {t('coming_soon', 'Monthly Deposit Coming Soon')}
+                </h1>
+                
+                <p className="text-xl text-gray-500 font-medium mb-10 leading-relaxed max-w-xl mx-auto">
+                  {t('maintenance_msg', 'We are currently upgrading our automated deposit systems to serve you better. This portal will be fully operational on:')}
+                </p>
+
+                <div className="inline-flex items-center gap-4 px-8 py-5 bg-[#1e3b8b] text-white rounded-3xl mb-12 shadow-xl shadow-[#1e3b8b]/20">
+                   <Calendar size={28} className="text-[#f4ac37]" />
+                   <div className="text-left">
+                      <p className="text-[10px] font-black uppercase tracking-widest opacity-60">Status: Maintenance</p>
+                      <p className="text-lg font-bold">Monday, April 20</p>
+                   </div>
+                </div>
+
+                <div className="border-t border-gray-100 pt-12">
+                   <p className="text-gray-400 font-bold uppercase tracking-widest text-xs mb-8">Manual Submission</p>
+                   
+                   <p className="text-gray-600 mb-8 max-w-lg mx-auto leading-relaxed">
+                     Until then, please send your deposit details and payment receipt directly to our support staff via Telegram for manual integration:
+                   </p>
+
+                   <a 
+                     href="https://t.me/gutudanii" 
+                     target="_blank" 
+                     rel="noopener noreferrer"
+                     className="inline-flex items-center gap-4 bg-[#0088cc] text-white px-10 py-5 rounded-3xl font-black hover:bg-[#0077b5] transition-all transform hover:scale-105 shadow-xl shadow-[#0088cc]/20 group"
+                   >
+                     <Send size={24} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                     {t('contact_staff', 'Contact Staff (@gutudanii)')}
+                   </a>
+                </div>
+             </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (success) {
     return (

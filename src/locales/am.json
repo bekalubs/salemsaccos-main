@@ -225,5 +225,8 @@
   "address_required_error": "እባክዎን ሁሉንም የአድራሻ ዝርዝሮች ይሙሉ (ክልል፣ ከተማ፣ ክፍለ ከተማ፣ ወረዳ፣ የቤት ቁጥር)",
   "documents_required_error": "ሁሉም ሰነዶች (መታወቂያ ፊት እና ጀርባ፣ ፕሮፋይል ፎቶ) እና ፊርማ ያስፈልጋሉ",
   "payment_required_error": "የክፍያ ደረሰኝ እና የመጀመሪያ እጣዎች ያስፈልጋሉ",
-  "select_marital_status": "የጋብቻ ሁኔታ ይምረጡ"
+  "select_marital_status": "የጋብቻ ሁኔታ ይምረጡ",
+  "coming_soon": "የቁጠባ ገጽ በጥገና ላይ ነው",
+  "maintenance_msg": "የተሻለ አገልግሎት ለመስጠት የቁጠባ ስርዓታችንን እያሻሻልን ነው። ይህ ገጽ ሰኞ ሚያዝያ 12 (April 20) ሙሉ በሙሉ ወደ ስራ ይመለሳል።",
+  "contact_staff": "በቴሌግራም ያግኙን (@gutudanii)"
 }
