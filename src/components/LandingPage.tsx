@@ -91,7 +91,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onContactClick }) => {
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center text-accent"><Users size={24} /></div>
                 <div>
-                  <div className="text-2xl font-black text-gray-900">{memberCount}+</div>
+                  <div className="text-2xl font-black text-gray-900">1000+</div>
                   <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t('members')}</div>
                 </div>
               </div>
