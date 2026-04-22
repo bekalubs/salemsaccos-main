@@ -139,7 +139,7 @@ const MonthlyDeposit: React.FC = () => {
                    <Calendar size={28} className="text-[#f4ac37]" />
                    <div className="text-left">
                       <p className="text-[10px] font-black uppercase tracking-widest opacity-60">Status: Maintenance</p>
-                      <p className="text-lg font-bold">Tuesday, April 21</p>
+                      <p className="text-lg font-bold">Coming Soon</p>
                    </div>
                 </div>
 
